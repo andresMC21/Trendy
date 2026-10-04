@@ -1,29 +1,24 @@
 databases:
-  - name: trendy-app-db # Nombre interno para referenciar la BD
-    databaseName: tr3ndy
-    user: tr3ndyD3v
-    plan: free # Plan gratuito (expira a los 30 días)
-    region: oregon # Usa la misma región para el servicio web
+  - name: trendy-app-db
+    databaseName: trendy_app_db
+    user: tr3ndyd3v
+    plan: free
+    region: oregon
 
 services:
   - type: web
     name: trendy-app-web
     runtime: node
-    plan: free # 750 horas/mes, se duerme tras 15 min de inactividad
+    plan: free
     region: oregon
     branch: main
-    # Build Command: instala dependencias y compila TypeScript
     buildCommand: npm ci && npm run build
-    # Start Command: ejecuta el código compilado
     startCommand: npm run start:prod
+    healthCheckPath: /health
     envVars:
-      # Inyecta la cadena de conexión de la BD automáticamente
       - key: DATABASE_URL
         fromDatabase:
           name: trendy-app-db
           property: connectionString
       - key: NODE_ENV
         value: production
-      # Añade aquí otros secretos (JWT_SECRET, etc.) con 'sync: false'
-      # - key: JWT_SECRET
-      #   sync: false

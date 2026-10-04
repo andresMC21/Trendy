@@ -12,7 +12,7 @@ services:
     plan: free
     region: oregon
     branch: main
-    buildCommand: npm ci && npm run build
+    buildCommand: buildCommand: npm install --include=dev && npm run build
     startCommand: npm run start:prod
     healthCheckPath: /health
     envVars:

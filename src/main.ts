@@ -1,34 +1,35 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+
+// Captura errores que ocurren antes de que NestJS inicialice su logger
+process.on('uncaughtException', (err) => {
+  console.error('💥 Uncaught Exception:', err);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('💥 Unhandled Rejection:', reason);
+});
 
 async function bootstrap() {
+  try {
+    console.log('🚀 Iniciando aplicación...');
+    console.log('PORT:', process.env.PORT);
+    console.log('DATABASE_URL presente:', !!process.env.DATABASE_URL);
+    console.log('NODE_ENV:', process.env.NODE_ENV);
 
-  const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule, {
+      logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+    });
 
-  const config = new DocumentBuilder()
-    .setTitle('Trendy Restful API')
-    .setDescription('...')
-    .setVersion('1.0')
-    .addBearerAuth({
-      type: 'http',
-      scheme: 'bearer',
-      bearerFormat: 'JWT',
-      name: 'JWT',
-      description: 'Enter the jwt token',
-      in: 'header',
-    },
-      'JWT-auth'
-    ).build();
+    app.enableCors();
 
-  app.enableCors();
-
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
-
-  await app.listen(process.env.PORT ?? 3000);
+    const port = process.env.PORT || 3000;
+    await app.listen(port, '0.0.0.0');
+    console.log(`✅ Application is running on port ${port}`);
+  } catch (error) {
+    console.error('❌ Error fatal durante el arranque:');
+    console.error(error);
+    process.exit(1);
+  }
 }
 
-
-
-void bootstrap();
+bootstrap();

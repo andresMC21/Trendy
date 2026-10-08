@@ -1,34 +1,58 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { RegisterUserDto } from './dto/register.dto';
+import { LoginUserDto } from './dto/login.dto';
+import { UpdateUserDto } from './dto/update.dto';
+import { Auth } from './decorators/auth.decorator';
+import { GetUser } from './decorators/get-user.decorator';
+import { User } from './entities/user.entity';
+
+type UploadedDocument = {
+  filename?: string;
+  originalname?: string;
+  path?: string;
+};
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  @Post('register')
+  register(@Body() registerDto: RegisterUserDto) {
+    return this.userService.create(registerDto);
   }
 
-  @Get()
-  findAll() {
-    return this.userService.findAll();
+  @Post('login')
+  login(@Body() loginDto: LoginUserDto) {
+    return this.userService.login(loginDto);
+  }
+
+  @Get('me')
+  @Auth()
+  getMe(@GetUser() user: User) {
+    return this.userService.findMe(user);
+  }
+
+  @Patch('me')
+  @Auth()
+  updateMe(@GetUser() user: User, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.updateMe(user, updateUserDto);
+  }
+
+  @Post('me/verify')
+  @Auth()
+  @UseInterceptors(FileInterceptor('document'))
+  requestVerification(
+    @GetUser() user: User,
+    @UploadedFile() document?: UploadedDocument,
+  ) {
+    return this.userService.requestVerification(user, document);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  @Auth()
+  getPublicProfile(@Param('id') id: string) {
+    return this.userService.findPublicProfile(id);
   }
 }

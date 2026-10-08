@@ -4,51 +4,45 @@ import { VerificationStatus } from '../enums/verification-status';
 import { User } from '../entities/user.entity';
 
 export class UserProfileDto {
-    @Expose()
-    id: string;
+  @Expose()
+  id: string;
 
-    @Expose()
-    email: string;
+  @Expose()
+  email: string;
 
-    @Expose()
-    fullName: string;
+  @Expose()
+  fullName: string;
 
-    @Expose()
-    photoUrl: string | null;
+  @Expose()
+  photoUrl: string | null;
 
-    @Expose()
-    description: string | null;
+  @Expose()
+  description: string | null;
 
-    @Expose()
-    role: ValidRoles;
+  @Expose()
+  role: ValidRoles[];
 
-    @Expose()
-    verificationStatus: VerificationStatus;
+  @Expose()
+  verificationStatus: VerificationStatus;
 
-    @Expose()
-    isActive: boolean;
+  @Expose()
+  isActive: boolean;
 
-    @Expose()
-    ratingAverage: number;
+  @Expose()
+  ratingAverage: number;
 
-    @Expose()
-    reviewsCount: number;
+  @Expose()
+  reviewsCount: number;
 
-    @Expose()
-    itemsReusedCount: number;
+  @Expose()
+  createdAt: Date;
 
-    @Expose()
-    wasteAvoidedKg: number;
+  @Expose()
+  updatedAt: Date;
 
-    @Expose()
-    createdAt: Date;
-
-    @Expose()
-    updatedAt: Date;
-
-    static fromEntity(user: User): UserProfileDto {
-        return plainToInstance(UserProfileDto, user, {
-            excludeExtraneousValues: true,
-        });
-    }
+  static fromEntity(user: User): UserProfileDto {
+    return plainToInstance(UserProfileDto, user, {
+      excludeExtraneousValues: true,
+    });
+  }
 }

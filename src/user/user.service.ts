@@ -1,41 +1,42 @@
-import { ConflictException, HttpException, Injectable, InternalServerErrorException, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { RegisterUserDto } from './dto/register.dto'
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, UpdateDateColumn } from 'typeorm';
-import { User } from './entities/user.entity';
-import bcrypt from "bcrypt";
-import { LoginUserDto } from './dto/login.dto';
-import { JwtPayload } from './interfaces/jwt.interface';
 import { JwtService } from '@nestjs/jwt';
-import { UserProfileDto } from './dto/profile.dto';
-import { UpdateUserDto } from './dto/update.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import bcrypt from 'bcrypt';
+import { ConflictException, HttpException, Injectable, InternalServerErrorException, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Repository } from 'typeorm';
+import { JwtPayload } from './interfaces/jwt.interface';
+import { LoginUserDto } from './dto/login.dto';
+import { RegisterUserDto } from './dto/register.dto';
 import { SearchUserDto } from './dto/search.dto';
-import { PaginationDto } from './dto/pagination.dto';
-import { Review } from '../review/entities/review.entity';
-import { ResolveVerification } from './dto/verification.dto';
-import { SetActiveStatus } from './dto/activeStatus.dto';
-import { ChangeRole } from './dto/changeRole.dto';
+import { UpdateUserDto } from './dto/update.dto';
+import { UserProfileDto } from './dto/profile.dto';
+import { User } from './entities/user.entity';
+import { VerificationStatus } from './enums/verification-status';
+
+type VerificationDocument = {
+  filename?: string;
+  originalname?: string;
+  path?: string;
+};
 
 @Injectable()
 export class UserService {
-
   private readonly logger = new Logger('UserService');
 
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    private jwtService: JwtService
+    private readonly jwtService: JwtService,
   ) { }
 
-
-  // Auth methods
   async create(registerDto: RegisterUserDto) {
     const { password, ...userDetails } = registerDto;
+
     try {
       const user = this.userRepository.create({
         ...userDetails,
-        password: this.encryptPassword(password)
-      })
+        password: this.encryptPassword(password),
+      });
+
       await this.userRepository.save(user);
       delete user.password;
 
@@ -43,8 +44,8 @@ export class UserService {
         ...user,
         token: this.getJwtToken({
           id: user.id,
-          email: user.email
-        })
+          email: user.email,
+        }),
       };
     } catch (error) {
       this.handleException(error);
@@ -52,65 +53,45 @@ export class UserService {
   }
 
   async login(loginDto: LoginUserDto) {
-
     const { email, password } = loginDto;
 
     const user = await this.userRepository.findOne({
       where: { email },
-      select: { email: true, password: true, id: true }
-    })
+      select: { email: true, password: true, id: true },
+    });
 
-    if (!user) throw new UnauthorizedException(`Email or password incorrect`);
+    if (!user) {
+      throw new UnauthorizedException('Email or password incorrect');
+    }
 
-    if (!bcrypt.compareSync(password, user.password!)) throw new UnauthorizedException(`Email or password incorrect`);
+    if (!bcrypt.compareSync(password, user.password!)) {
+      throw new UnauthorizedException('Email or password incorrect');
+    }
 
     delete user.password;
+
     return {
       ...user,
       token: this.getJwtToken({
         id: user.id,
-        email: user.email
-      })
+        email: user.email,
+      }),
     };
   }
 
-  encryptPassword(password: string) {
-
-    return bcrypt.hashSync(password, 10);
-
-  }
-
-  private getJwtToken(jwtPayload: JwtPayload) {
-
-    const token = this.jwtService.sign(jwtPayload);
-    return token;
-
-  }
-
-  private handleException(error: any): never {
-
-    if (error instanceof HttpException) throw error;
-
-    this.logger.error(error);
-
-    if (error.code === '23505') throw new ConflictException(error.detail);
-
-    throw new InternalServerErrorException('Unexpected error, check server logs');
-  }
-
-  // Profile
-
   findMe(user: User): UserProfileDto {
-
-    return this.toProfile(user)
-
+    return this.toProfile(user);
   }
 
-  async updateMe(user: User, updateUserDto: UpdateUserDto): Promise<UserProfileDto> {
-
+  async updateMe(
+    user: User,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserProfileDto> {
     const userToUpdate = await this.preloadUser(user.id, updateUserDto);
 
-    if (!userToUpdate) throw new NotFoundException(`User with id ${user.id} not found`);
+    if (!userToUpdate) {
+      throw new NotFoundException(`User with id ${user.id} not found`);
+    }
 
     try {
       await this.userRepository.save(userToUpdate);
@@ -120,103 +101,119 @@ export class UserService {
     }
   }
 
-  private async preloadUser(userId: string, updateDto?: UpdateUserDto): Promise<User | undefined> {
+  async requestVerification(
+    user: User,
+    document?: VerificationDocument,
+  ): Promise<UserProfileDto> {
+    const identityDocumentUrl =
+      document?.path ?? document?.filename ?? document?.originalname;
 
-    return await this.userRepository.preload({
+    const userToUpdate = await this.preloadUser(user.id, {
+      identityDocumentUrl,
+      verificationStatus: VerificationStatus.PENDING,
+    });
+
+    if (!userToUpdate) {
+      throw new NotFoundException(`User with id ${user.id} not found`);
+    }
+
+    try {
+      await this.userRepository.save(userToUpdate);
+      return this.toProfile(userToUpdate);
+    } catch (error) {
+      this.handleException(error);
+    }
+  }
+
+  async findPublicProfile(id: string): Promise<UserProfileDto> {
+    const user = await this.userRepository.findOneBy({ id });
+
+    if (!user) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+
+    return this.toProfile(user);
+  }
+
+  async findProfile(
+    searchDto: SearchUserDto,
+  ): Promise<UserProfileDto | undefined> {
+    try {
+      if (typeof searchDto.email === 'string') {
+        const user = await this.userRepository.findOneBy({
+          email: searchDto.email,
+        });
+
+        if (user) {
+          return this.toProfile(user);
+        }
+      }
+
+      if (typeof searchDto.fullName === 'string') {
+        const user = await this.userRepository.findOneBy({
+          fullName: searchDto.fullName,
+        });
+
+        if (user) {
+          return this.toProfile(user);
+        }
+      }
+
+      return undefined;
+    } catch (error) {
+      this.handleException(error);
+    }
+  }
+
+  findByEmail(email: string) {
+    return this.userRepository.findOne({
+      where: { email },
+      select: { email: true, password: true, id: true },
+    });
+  }
+
+  private encryptPassword(password: string) {
+    return bcrypt.hashSync(password, 10);
+  }
+
+  private getJwtToken(jwtPayload: JwtPayload) {
+    return this.jwtService.sign(jwtPayload);
+  }
+
+  private async preloadUser(
+    userId: string,
+    updateDto?: Partial<User>,
+  ): Promise<User | undefined> {
+    return this.userRepository.preload({
       id: userId,
       ...updateDto,
     });
   }
 
-  async findProfile(searchDto: SearchUserDto): Promise<UserProfileDto | undefined> {
-
-    try {
-
-      if (typeof searchDto.email === 'string') {
-
-        const finded = await this.userRepository.findOneBy({ email: searchDto.email })
-
-        if (finded !== null) return UserProfileDto.fromEntity(finded);
-      }
-
-      if (typeof searchDto.fullName === 'string') {
-
-        const finded = await this.userRepository.findOneBy({ fullName: searchDto.fullName })
-
-        if (finded !== null) return UserProfileDto.fromEntity(finded);
-      }
-
-    } catch (error) {
-
-      this.handleException(error);
-
-    }
-
-  }
-
-  /*
-  findReviews(id: string, paginationDto: PaginationDto): Promise<Review[]> {
-    
-    try {
-      
-
-
-    } catch (error) {
-      
-    }
-
-  }
-    */
-
-  /*
-  createReview(reviwer: User, targetId: string, dto: CreateReviewDto): Promise<Review> {
-
-  }
-  */
-
-  /*
-  async updateRatingAverage(userId: string): Promise<void> {
-
-  }
-  */
-
-  async findByEmail(email: string) {
-
-    return await this.userRepository.findOne({
-      where: { email },
-      select: { email: true, password: true, id: true }
-    })
-  }
-
   private toProfile(user: User): UserProfileDto {
-
     return UserProfileDto.fromEntity(user);
-
   }
 
-  /*
-  async listPendingVerifications(paginationDto: PaginationDto): Promise<UserProfileDto[]>{
+  private handleException(error: unknown): never {
+    if (error instanceof HttpException) {
+      throw error;
+    }
 
+    this.logger.error(error);
+
+    if (this.isDatabaseError(error) && error.code === '23505') {
+      throw new ConflictException(error.detail);
+    }
+
+    throw new InternalServerErrorException(
+      'Unexpected error, check server logs',
+    );
   }
-  */
 
-  /*
-  async resolveVerification(userId: string, dto: ResolveVerification, reviewer: User): Promise<UserProfileDto> {
-
-
+  private isDatabaseError(error: unknown): error is {
+    code?: string;
+    detail?: string;
+  } {
+    return typeof error === 'object' && error !== null;
   }
-  */
-
-  /*
-  async setActiveStatus(userId: string, dto: SetActiveStatus, actor: User): Promise<void>{
-
-  }
-  */
-
-  /*
-  async changeRole(userId: string, dto: ChangeRole, actor: User): Promise<UserProfileDto>{
-
-  }
-  */
-
 }

@@ -1,4 +1,6 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { VerificationStatus } from "../enums/verification-status";
+import { ValidRoles } from "../enums/valid-roles.enum";
 
 @Entity()
 export class User {
@@ -15,7 +17,7 @@ export class User {
     @Column({
         type: "text"
     })
-    password: string;
+    password?: string;
 
     @Column({
         type: "text"
@@ -35,7 +37,7 @@ export class User {
     @Column({
         type: "text",
     })
-    verificationStatuts: string;
+    verificationStatuts: VerificationStatus.UNVERIFIED;
 
     @Column({
         type: "text",
@@ -53,22 +55,26 @@ export class User {
     reviewsCount: number;
 
     @Column({
-        type: "text",
-    })
-    refreshTokenHash?: string;
-
-    @Column({
         type: "boolean",
     })
     isActive: boolean;
 
-    @Column({
-        type: "date",
-    })
+    @CreateDateColumn()
     createdAt: Date;
 
-    @Column({
-        type: "date",
-    })
+    @CreateDateColumn()
     updatedAt: Date;
+
+    @Column({
+        type: 'text',
+        array: true,
+        default: ['USER']
+    })
+    role: ValidRoles[];
+
+    @BeforeInsert()
+    @BeforeUpdate()
+    checkEmailBeforeChanges() {
+        this.email = this.email.toLowerCase().trim();
+    }
 }

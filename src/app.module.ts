@@ -5,6 +5,7 @@ import { UserModule } from './user/user.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { ProductModule } from './product/product.module';
 import { ReviewModule } from './review/review.module';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -13,10 +14,28 @@ import { ReviewModule } from './review/review.module';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         const url = config.get<string>('DATABASE_URL');
+        const nodeEnv = config.get<string>('NODE_ENV');
+        const isProduction = nodeEnv === 'production';
+
+        // Supports both names used by the two original configurations.
+        const synchronizeSetting =
+          config.get<string>('DB_SYNCHRONIZE') ??
+          config.get<string>('TYPEORM_SYNCHRONIZE');
+        const synchronize = synchronizeSetting
+          ? synchronizeSetting === 'true'
+          : !isProduction;
+
+        // DB_SSL explicitly overrides the environment-based default.
+        const sslSetting = config.get<string>('DB_SSL');
         const ssl =
-          config.get<string>('DB_SSL') === 'true'
-            ? { rejectUnauthorized: false }
-            : false;
+          sslSetting !== undefined
+            ? sslSetting === 'true'
+              ? { rejectUnauthorized: false }
+              : false
+            : isProduction
+              ? { rejectUnauthorized: false }
+              : false;
+
         return {
           type: 'postgres' as const,
           ...(url
@@ -30,8 +49,7 @@ import { ReviewModule } from './review/review.module';
               }),
           ssl,
           autoLoadEntities: true,
-          // En Render se deja en true para crear las tablas la primera vez.
-          synchronize: config.get<string>('DB_SYNCHRONIZE') !== 'false',
+          synchronize,
         };
       },
     }),
@@ -40,5 +58,6 @@ import { ReviewModule } from './review/review.module';
     ProductModule,
     ReviewModule,
   ],
+  controllers: [HealthController],
 })
 export class AppModule {}

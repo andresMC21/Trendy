@@ -25,37 +25,44 @@ export class User {
     fullName: string;
 
     @Column({
-        type: "text"
+        type: "text",
+        nullable: true
     })
     photoUrl: string | null;
 
     @Column({
         type: "text",
+        nullable: true
     })
     info?: string;
 
     @Column({
         type: "text",
+        default: VerificationStatus.UNVERIFIED
     })
     verificationStatuts: VerificationStatus.UNVERIFIED;
 
     @Column({
         type: "text",
+        nullable: true
     })
     identityDocumentUrl?: string;
 
     @Column({
         type: "float",
+        default: 0
     })
     ratingAverage?: number;
 
     @Column({
         type: "integer",
+        default: 0
     })
     reviewsCount: number;
 
     @Column({
         type: "boolean",
+        default: true
     })
     isActive: boolean;
 

@@ -1,0 +1,15 @@
+# Postgres con PostGIS (necesario para la columna geography de Product)
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: trendy-db
+    environment:
+      POSTGRES_USER: trendy
+      POSTGRES_PASSWORD: trendy
+      POSTGRES_DB: trendy
+    ports:
+      - '5432:5432'
+    volumes:
+      - trendy-db-data:/var/lib/postgresql/data
+volumes:
+  trendy-db-data:

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { TransactionModule } from './transaction/transaction.module';
@@ -7,27 +7,51 @@ import { ProductModule } from './product/product.module';
 import { ReviewModule } from './review/review.module';
 import { HealthController } from './health.controller';
 
-const shouldSynchronizeDatabase =
-  process.env.TYPEORM_SYNCHRONIZE === 'true' ||
-  process.env.NODE_ENV !== 'production';
-
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      url: process.env.DATABASE_URL,
-      host: process.env.DB_HOST,
-      port: Number(process.env.DB_PORT ?? 5432),
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      autoLoadEntities: true,
-      synchronize: shouldSynchronizeDatabase,
-      ssl:
-        process.env.NODE_ENV === 'production'
-          ? { rejectUnauthorized: false }
-          : false,
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        const url = config.get<string>('DATABASE_URL');
+        const nodeEnv = config.get<string>('NODE_ENV');
+        const isProduction = nodeEnv === 'production';
+
+        // Supports both names used by the two original configurations.
+        const synchronizeSetting =
+          config.get<string>('DB_SYNCHRONIZE') ??
+          config.get<string>('TYPEORM_SYNCHRONIZE');
+        const synchronize = synchronizeSetting
+          ? synchronizeSetting === 'true'
+          : !isProduction;
+
+        // DB_SSL explicitly overrides the environment-based default.
+        const sslSetting = config.get<string>('DB_SSL');
+        const ssl =
+          sslSetting !== undefined
+            ? sslSetting === 'true'
+              ? { rejectUnauthorized: false }
+              : false
+            : isProduction
+              ? { rejectUnauthorized: false }
+              : false;
+
+        return {
+          type: 'postgres' as const,
+          ...(url
+            ? { url }
+            : {
+                host: config.get<string>('DB_HOST'),
+                port: Number(config.get<string>('DB_PORT') ?? 5432),
+                database: config.get<string>('DB_NAME'),
+                username: config.get<string>('DB_USERNAME'),
+                password: config.get<string>('DB_PASSWORD'),
+              }),
+          ssl,
+          autoLoadEntities: true,
+          synchronize,
+        };
+      },
     }),
     UserModule,
     TransactionModule,

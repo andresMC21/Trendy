@@ -1,6 +1,6 @@
-import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
-import { VerificationStatus } from "../enums/verification-status";
-import { ValidRoles } from "../enums/valid-roles.enum";
+import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from 'typeorm';
+import { VerificationStatus } from '../enums/verification-status';
+import { ValidRoles } from '../enums/valid-roles.enum';
 
 @Entity()
 export class User {

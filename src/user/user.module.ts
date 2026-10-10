@@ -24,18 +24,6 @@ import { UserService } from './user.service';
     }),
   ],
   controllers: [UserController],
-  imports: [
-    TypeOrmModule.forFeature([User]),
-    PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        secret: config.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '1h' },
-      }),
-    }),
-  ],
   providers: [UserService, JwtStrategy],
   // Otros módulos (product, transaction) importan UserModule para usar @Auth()
   exports: [TypeOrmModule, PassportModule, JwtModule, JwtStrategy, UserService],

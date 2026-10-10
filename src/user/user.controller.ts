@@ -3,18 +3,6 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { LoginUserDto } from './dto/login.dto';
 import { RegisterUserDto } from './dto/register.dto';
 import { UserService } from './user.service';
-import { RegisterUserDto } from './dto/register.dto';
-import { LoginUserDto } from './dto/login.dto';
-import { UpdateUserDto } from './dto/update.dto';
-import { Auth } from './decorators/auth.decorator';
-import { GetUser } from './decorators/get-user.decorator';
-import { User } from './entities/user.entity';
-
-type UploadedDocument = {
-  filename?: string;
-  originalname?: string;
-  path?: string;
-};
 
 @ApiTags('Users')
 @Controller('user')

@@ -24,7 +24,7 @@ jobs:
           cache: npm
 
       - name: Instalar dependencias
-        run: npm ci
+        run: npm install --include=dev
 
       - name: Ejecutar pruebas unitarias
         run: npm run test -- --runInBand

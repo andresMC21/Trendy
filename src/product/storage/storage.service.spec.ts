@@ -11,13 +11,25 @@ const WEBP = Buffer.concat([Buffer.from('RIFF'), Buffer.from([0, 0, 0, 0]), Buff
 
 describe('detectImageExtension', () => {
   it('reconoce JPG, PNG y WEBP por sus bytes', () => {
+    // Arrange
+    // Act
+    // Assert
     expect(detectImageExtension(JPG)).toBe('jpg');
     expect(detectImageExtension(PNG)).toBe('png');
     expect(detectImageExtension(WEBP)).toBe('webp');
   });
   it('rechaza cualquier otra cosa', () => {
-    expect(detectImageExtension(Buffer.from('hola mundo'))).toBeNull();
-    expect(detectImageExtension(Buffer.alloc(0))).toBeNull();
+    // Arrange
+    const textBuffer = Buffer.from('hola mundo');
+    const emptyBuffer = Buffer.alloc(0);
+
+    // Act
+    const textResult = detectImageExtension(textBuffer);
+    const emptyResult = detectImageExtension(emptyBuffer);
+
+    // Assert
+    expect(textResult).toBeNull();
+    expect(emptyResult).toBeNull();
   });
 });
 
@@ -38,30 +50,53 @@ describe('StorageService', () => {
   });
 
   it('guarda el archivo y devuelve la URL pública', async () => {
-    const url = await service.saveProductImage({ buffer: PNG } as Express.Multer.File);
+    // Arrange
+    const file = { buffer: PNG } as Express.Multer.File;
+
+    // Act
+    const url = await service.saveProductImage(file);
+
+    // Assert
     expect(url).toMatch(/^http:\/\/host\/uploads\/products\/[0-9a-f-]+\.png$/);
     expect(existsSync(join(dir, 'up', 'products', basename(url)))).toBe(true);
   });
 
   it('rechaza contenido que no es imagen aunque el cliente diga lo contrario', async () => {
-    await expect(
-      service.saveProductImage({ buffer: Buffer.from('<script>'), mimetype: 'image/jpeg' } as Express.Multer.File),
-    ).rejects.toBeInstanceOf(BadRequestException);
-    await expect(service.saveProductImage({} as Express.Multer.File)).rejects.toBeInstanceOf(BadRequestException);
+    // Arrange
+    const fakeImage = { buffer: Buffer.from('<script>'), mimetype: 'image/jpeg' } as Express.Multer.File;
+    const emptyFile = {} as Express.Multer.File;
+
+    // Act
+    const fakeImageResult = service.saveProductImage(fakeImage);
+    const emptyFileResult = service.saveProductImage(emptyFile);
+
+    // Assert
+    await expect(fakeImageResult).rejects.toBeInstanceOf(BadRequestException);
+    await expect(emptyFileResult).rejects.toBeInstanceOf(BadRequestException);
   });
 
   it('delete borra el archivo, ignora URLs ajenas y no falla si ya no existe', async () => {
+    // Arrange
     const url = await service.saveProductImage({ buffer: JPG } as Express.Multer.File);
     const path = join(dir, 'up', 'products', basename(url));
+
+    // Act
     await service.delete(url);
+
+    // Assert
     expect(existsSync(path)).toBe(false);
     await expect(service.delete(url)).resolves.toBeUndefined();
     await expect(service.delete('http://otro/sitio.jpg')).resolves.toBeUndefined();
   });
 
   it('usa rutas por defecto si no hay configuración', async () => {
+    // Arrange
     const def = new StorageService({ get: () => undefined } as unknown as ConfigService);
+
+    // Act
     const url = await def.saveProductImage({ buffer: JPG } as Express.Multer.File);
+
+    // Assert
     expect(url.startsWith('/uploads/products/')).toBe(true);
   });
 });

@@ -24,6 +24,9 @@ describe('TransactionController', () => {
   });
 
   it('should be defined', () => {
+    // Arrange
+    // Act
+    // Assert
     expect(controller).toBeDefined();
   });
 

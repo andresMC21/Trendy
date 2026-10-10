@@ -13,6 +13,9 @@ describe('ReviewService', () => {
   });
 
   it('should be defined', () => {
+    // Arrange
+    // Act
+    // Assert
     expect(service).toBeDefined();
   });
 });

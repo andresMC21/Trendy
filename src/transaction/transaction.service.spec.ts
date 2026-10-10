@@ -13,6 +13,9 @@ describe('TransactionService', () => {
   });
 
   it('should be defined', () => {
+    // Arrange
+    // Act
+    // Assert
     expect(service).toBeDefined();
   });
 });

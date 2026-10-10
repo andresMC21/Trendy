@@ -15,6 +15,9 @@ describe('ReviewController', () => {
   });
 
   it('should be defined', () => {
+    // Arrange
+    // Act
+    // Assert
     expect(controller).toBeDefined();
   });
 });

@@ -13,6 +13,9 @@ describe('UserService', () => {
   });
 
   it('should be defined', () => {
+    // Arrange
+    // Act
+    // Assert
     expect(service).toBeDefined();
   });
 });

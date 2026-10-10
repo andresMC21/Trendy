@@ -29,39 +29,84 @@ describe('ProductController', () => {
   });
 
   it('findAll delega el query', async () => {
-    expect(await controller.findAll({ page: 2 })).toBe('list');
-    expect(service.findAll).toHaveBeenCalledWith({ page: 2 });
+    // Arrange
+    const query = { page: 2 };
+
+    // Act
+    const result = await controller.findAll(query);
+
+    // Assert
+    expect(result).toBe('list');
+    expect(service.findAll).toHaveBeenCalledWith(query);
   });
 
   it('findOne delega el id', async () => {
-    expect(await controller.findOne('p1')).toBe('detail');
-    expect(service.findOne).toHaveBeenCalledWith('p1');
+    // Arrange
+    const productId = 'p1';
+
+    // Act
+    const result = await controller.findOne(productId);
+
+    // Assert
+    expect(result).toBe('detail');
+    expect(service.findOne).toHaveBeenCalledWith(productId);
   });
 
   it('create usa el id del usuario autenticado', async () => {
+    // Arrange
     const dto: any = { title: 'x' };
-    expect(await controller.create(user, dto)).toBe('created');
+
+    // Act
+    const result = await controller.create(user, dto);
+
+    // Assert
+    expect(result).toBe('created');
     expect(service.create).toHaveBeenCalledWith('u1', dto);
   });
 
   it('update pasa id, usuario y dto', async () => {
-    await controller.update('p1', user, { price: 1 });
-    expect(service.update).toHaveBeenCalledWith('p1', 'u1', { price: 1 });
+    // Arrange
+    const dto = { price: 1 };
+
+    // Act
+    await controller.update('p1', user, dto);
+
+    // Assert
+    expect(service.update).toHaveBeenCalledWith('p1', 'u1', dto);
   });
 
   it('remove pasa los roles del usuario (moderación)', async () => {
-    await controller.remove('p1', user);
-    expect(service.remove).toHaveBeenCalledWith('p1', 'u1', [ValidRoles.USER]);
+    // Arrange
+    const productId = 'p1';
+
+    // Act
+    await controller.remove(productId, user);
+
+    // Assert
+    expect(service.remove).toHaveBeenCalledWith(productId, 'u1', [ValidRoles.USER]);
   });
 
   it('addImages pasa los archivos', async () => {
+    // Arrange
     const files = [{}] as Express.Multer.File[];
-    expect(await controller.addImages('p1', user, files)).toBe('images');
+
+    // Act
+    const result = await controller.addImages('p1', user, files);
+
+    // Assert
+    expect(result).toBe('images');
     expect(service.addImages).toHaveBeenCalledWith('p1', 'u1', files);
   });
 
   it('toggleFavorite', async () => {
-    expect(await controller.toggleFavorite('p1', user)).toEqual({ isFavorite: true });
-    expect(service.toggleFavorite).toHaveBeenCalledWith('p1', 'u1');
+    // Arrange
+    const productId = 'p1';
+
+    // Act
+    const result = await controller.toggleFavorite(productId, user);
+
+    // Assert
+    expect(result).toEqual({ isFavorite: true });
+    expect(service.toggleFavorite).toHaveBeenCalledWith(productId, 'u1');
   });
 });

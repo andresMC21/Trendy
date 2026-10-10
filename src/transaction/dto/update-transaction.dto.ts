@@ -1,4 +1,12 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateTransactionDto } from './create-transaction.dto';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEnum } from 'class-validator';
+import { TransactionStatus } from '../enums/transaction-status.enum';
 
-export class UpdateTransactionDto extends PartialType(CreateTransactionDto) {}
+export class UpdateTransactionDto {
+  @ApiProperty({
+    enum: TransactionStatus,
+    example: TransactionStatus.COMPLETED,
+  })
+  @IsEnum(TransactionStatus)
+  status: TransactionStatus;
+}

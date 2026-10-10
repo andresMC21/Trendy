@@ -40,7 +40,7 @@ export class User {
         type: "text",
         default: VerificationStatus.UNVERIFIED
     })
-    verificationStatuts: VerificationStatus.UNVERIFIED;
+    verificationStatus: VerificationStatus;
 
     @Column({
         type: "text",

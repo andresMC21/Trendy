@@ -57,8 +57,6 @@ describe('seed data', () => {
     // Act / Assert
     expect(seedUsers.length).toBeGreaterThanOrEqual(4);
     expect(seedProducts.length).toBeGreaterThanOrEqual(3);
-    expect(seedProducts.every((product) => product.images.length > 0)).toBe(
-      true,
-    );
+    expect(seedTransactions.length).toBeGreaterThanOrEqual(1);
   });
 });

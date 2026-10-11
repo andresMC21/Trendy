@@ -25,7 +25,6 @@ const makeProduct = (over: any = {}) => ({
   location: { type: 'Point', coordinates: [-76.5, 3.4] },
   neighborhoodId: 'granada',
   estimatedWeightKg: 10,
-  images: [],
   viewsCount: 0,
   createdAt: new Date(),
   updatedAt: new Date(),
@@ -213,7 +212,7 @@ describe('TransactionService', () => {
     expect(transactionRepository.find).toHaveBeenCalledWith({
       where: [{ buyerId: 'buyer-1' }, { sellerId: 'buyer-1' }],
       relations: {
-        product: { images: true },
+        product: true,
         buyer: true,
         seller: true,
       },

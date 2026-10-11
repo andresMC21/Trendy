@@ -101,7 +101,7 @@ export class TransactionService {
     const transactions = await this.transactionRepository.find({
       where: [{ buyerId: userId }, { sellerId: userId }],
       relations: {
-        product: { images: true },
+        product: true,
         buyer: true,
         seller: true,
       },
@@ -188,7 +188,7 @@ export class TransactionService {
     const transaction = await this.transactionRepository.findOne({
       where: { id },
       relations: {
-        product: { images: true },
+        product: true,
         buyer: true,
         seller: true,
       },

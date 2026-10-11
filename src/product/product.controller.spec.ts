@@ -13,7 +13,6 @@ describe('ProductController', () => {
     create: jest.fn().mockResolvedValue('created'),
     update: jest.fn().mockResolvedValue('updated'),
     remove: jest.fn().mockResolvedValue(undefined),
-    addImages: jest.fn().mockResolvedValue('images'),
     toggleFavorite: jest.fn().mockResolvedValue({ isFavorite: true }),
   };
   const user = { id: 'u1', role: [ValidRoles.USER] } as User;
@@ -86,18 +85,6 @@ describe('ProductController', () => {
     expect(service.remove).toHaveBeenCalledWith(productId, 'u1', [
       ValidRoles.USER,
     ]);
-  });
-
-  it('addImages pasa los archivos', async () => {
-    // Arrange
-    const files = [{}] as Express.Multer.File[];
-
-    // Act
-    const result = await controller.addImages('p1', user, files);
-
-    // Assert
-    expect(result).toBe('images');
-    expect(service.addImages).toHaveBeenCalledWith('p1', 'u1', files);
   });
 
   it('toggleFavorite', async () => {

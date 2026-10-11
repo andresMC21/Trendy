@@ -1,6 +1,5 @@
 import dataSource from '../database/data-source';
 import bcrypt from 'bcrypt';
-import { ProductImage } from '../product/entities/product-image.entity';
 import { Product } from '../product/entities/product.entity';
 import { toGeoJson } from '../product/interfaces/geo.interface';
 import { Review } from '../review/entities/review.entity';
@@ -22,7 +21,6 @@ async function seed(): Promise<void> {
     await dataSource.transaction(async (manager) => {
       const userRepository = manager.getRepository(User);
       const productRepository = manager.getRepository(Product);
-      const imageRepository = manager.getRepository(ProductImage);
       const transactionRepository = manager.getRepository(Transaction);
       const reviewRepository = manager.getRepository(Review);
 
@@ -47,24 +45,13 @@ async function seed(): Promise<void> {
       }
 
       for (const seedProduct of seedProducts) {
-        const { images, location, ...product } = seedProduct;
+        const { location, ...product } = seedProduct;
         await productRepository.save(
           productRepository.create({
             ...product,
             location: toGeoJson(location),
             viewsCount: 0,
           }),
-        );
-
-        await imageRepository.delete({ productId: product.id });
-        await imageRepository.save(
-          images.map((url, position) =>
-            imageRepository.create({
-              productId: product.id,
-              url,
-              position,
-            }),
-          ),
         );
       }
 

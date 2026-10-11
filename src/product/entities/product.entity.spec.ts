@@ -3,7 +3,6 @@ import { ProductDto } from '../dto/product.dto';
 import { ProductCondition } from '../enums/product-condition.enum';
 import { ProductStatus } from '../enums/product-status.enum';
 import { fromGeoJson, toGeoJson } from '../interfaces/geo.interface';
-import { ProductImage } from './product-image.entity';
 import { Product } from './product.entity';
 
 describe('Product entity', () => {
@@ -60,7 +59,7 @@ describe('Product entity', () => {
     });
   });
 
-  it('define relaciones con vendedor, imagenes y favoritos', () => {
+  it('define relaciones con vendedor y favoritos', () => {
     // Arrange
     const relationNames = relations
       .filter((relation) => relation.target === Product)
@@ -68,8 +67,9 @@ describe('Product entity', () => {
 
     // Act / Assert
     expect(relationNames).toEqual(
-      expect.arrayContaining(['seller', 'images', 'favoritedBy']),
+      expect.arrayContaining(['seller', 'favoritedBy']),
     );
+    expect(relationNames).not.toContain('images');
   });
 
   it('convierte puntos entre API y GeoJSON preservando orden lng/lat', () => {
@@ -85,12 +85,8 @@ describe('Product entity', () => {
     expect(roundTrip).toEqual(apiPoint);
   });
 
-  it('ProductDto ordena imagenes y aplica valores extra desde la entidad', () => {
+  it('ProductDto aplica valores extra desde la entidad', () => {
     // Arrange
-    const images = [
-      { id: 'img-2', productId: 'p1', url: '/b.jpg', position: 2 },
-      { id: 'img-1', productId: 'p1', url: '/a.jpg', position: 1 },
-    ] as ProductImage[];
     const product = {
       id: 'p1',
       sellerId: 'user-1',
@@ -104,7 +100,6 @@ describe('Product entity', () => {
       location: { type: 'Point', coordinates: [-76.5, 3.4] },
       neighborhoodId: 'granada',
       estimatedWeightKg: undefined,
-      images,
       viewsCount: 7,
       createdAt: new Date('2026-10-01T00:00:00Z'),
       updatedAt: new Date('2026-10-02T00:00:00Z'),
@@ -117,7 +112,6 @@ describe('Product entity', () => {
     });
 
     // Assert
-    expect(result.images.map((image) => image.id)).toEqual(['img-1', 'img-2']);
     expect(result.location).toEqual({ lat: 3.4, lng: -76.5 });
     expect(result.estimatedWeightKg).toBeNull();
     expect(result.favoritesCount).toBe(4);

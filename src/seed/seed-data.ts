@@ -61,10 +61,6 @@ export const seedProducts = [
     location: { lat: 3.4516, lng: -76.532 },
     neighborhoodId: 'granada',
     estimatedWeightKg: 12,
-    images: [
-      'https://images.unsplash.com/photo-1485965120184-e220f721d03e',
-      'https://images.unsplash.com/photo-1507035895480-2b3156c31fc8',
-    ],
   },
   {
     id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
@@ -80,7 +76,6 @@ export const seedProducts = [
     location: { lat: 3.4567, lng: -76.5312 },
     neighborhoodId: 'granada',
     estimatedWeightKg: 5,
-    images: ['https://images.unsplash.com/photo-1512820790803-83ca734da794'],
   },
   {
     id: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
@@ -95,7 +90,6 @@ export const seedProducts = [
     location: { lat: 3.4695, lng: -76.5225 },
     neighborhoodId: 'san-fernando',
     estimatedWeightKg: 9,
-    images: ['https://images.unsplash.com/photo-1580480055273-228ff5388ef8'],
   },
 ] as const;
 

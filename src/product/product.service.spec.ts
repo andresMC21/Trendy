@@ -9,12 +9,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ValidRoles } from '../user/enums/valid-roles.enum';
 import { Product } from './entities/product.entity';
-import { ProductImage } from './entities/product-image.entity';
 import { ProductCondition } from './enums/product-condition.enum';
 import { ProductSort } from './enums/product-sort.enum';
 import { ProductStatus } from './enums/product-status.enum';
 import { ProductService } from './product.service';
-import { StorageService } from './storage/storage.service';
 
 /** QueryBuilder encadenable: cada método devuelve el mismo objeto. */
 const makeQb = () => {
@@ -48,30 +46,23 @@ const makeProduct = (over: Partial<Product> = {}): Product =>
     location: { type: 'Point', coordinates: [-76.5, 3.4] },
     neighborhoodId: 'granada',
     estimatedWeightKg: 10,
-    images: [],
     viewsCount: 0,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...over,
   }) as Product;
 
-const file = (name = 'a.jpg') =>
-  ({ originalname: name, buffer: Buffer.from([0xff, 0xd8, 0xff]) }) as Express.Multer.File;
 
 describe('ProductService', () => {
   let service: ProductService;
   let qb: ReturnType<typeof makeQb>;
   const productRepo: any = {};
-  const imageRepo: any = {};
-  const storage = { saveProductImage: jest.fn(), delete: jest.fn() };
 
   const build = async (ttl = '30') => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ProductService,
         { provide: getRepositoryToken(Product), useValue: productRepo },
-        { provide: getRepositoryToken(ProductImage), useValue: imageRepo },
-        { provide: StorageService, useValue: storage },
         { provide: ConfigService, useValue: { get: () => ttl } },
       ],
     }).compile();
@@ -89,11 +80,6 @@ describe('ProductService', () => {
       findOneBy: jest.fn(),
       update: jest.fn().mockResolvedValue(undefined),
       increment: jest.fn().mockResolvedValue(undefined),
-    });
-    Object.assign(imageRepo, {
-      find: jest.fn().mockResolvedValue([]),
-      create: jest.fn((x) => ({ ...x })),
-      save: jest.fn(async (list) => list.map((x: any, i: number) => ({ id: `img${i}`, ...x }))),
     });
     await build();
   });
@@ -123,7 +109,6 @@ describe('ProductService', () => {
         }),
       );
       expect(result.location).toEqual({ lat: 3.4, lng: -76.5 });
-      expect(result.images).toEqual([]);
     });
 
     it('invalida el caché del barrio', async () => {
@@ -164,11 +149,10 @@ describe('ProductService', () => {
       );
     });
 
-    it('devuelve resultado paginado con imágenes y favoritos', async () => {
+    it('devuelve resultado paginado con favoritos', async () => {
       // Arrange
       qb.getCount.mockResolvedValue(1);
       qb.getRawAndEntities.mockResolvedValue({ entities: [makeProduct()], raw: [{}] });
-      imageRepo.find.mockResolvedValue([{ id: 'i1', productId: 'p1', url: '/u/1.jpg', position: 0 }]);
       qb.getRawMany.mockResolvedValue([{ id: 'p1', count: '3' }]);
 
       // Act
@@ -176,7 +160,6 @@ describe('ProductService', () => {
 
       // Assert
       expect(res).toMatchObject({ total: 1, page: 2, limit: 5 });
-      expect(res.items[0].images).toHaveLength(1);
       expect(res.items[0].favoritesCount).toBe(3);
       expect(res.items[0].distanceKm).toBeUndefined();
       expect(qb.offset).toHaveBeenCalledWith(5);
@@ -215,7 +198,7 @@ describe('ProductService', () => {
       expect(qb.orderBy).toHaveBeenCalledWith(column, dir);
     });
 
-    it('lista vacía no consulta imágenes ni favoritos', async () => {
+    it('devuelve una lista vacía', async () => {
       // Arrange
 
       // Act
@@ -223,7 +206,6 @@ describe('ProductService', () => {
 
       // Assert
       expect(res.items).toEqual([]);
-      expect(imageRepo.find).not.toHaveBeenCalled();
     });
 
     it('usa el caché en la segunda llamada y se vacía al invalidar', async () => {
@@ -409,10 +391,9 @@ describe('ProductService', () => {
       // Assert
       await expect(service.update('p1', 'seller-1', {})).rejects.toBeInstanceOf(ConflictException);
     });
-    it('actualiza campos y ubicación, conserva imágenes', async () => {
+    it('actualiza campos y ubicación', async () => {
       // Arrange
-      const img = { id: 'i', productId: 'p1', url: 'u', position: 0 } as ProductImage;
-      productRepo.findOne.mockResolvedValue(makeProduct({ images: [img] }));
+      productRepo.findOne.mockResolvedValue(makeProduct());
 
       // Act
       const res = await service.update('p1', 'seller-1', { price: 50, location: { lat: 1, lng: 2 } });
@@ -421,8 +402,6 @@ describe('ProductService', () => {
       // Assert
       expect(saved.price).toBe(50);
       expect(saved.location).toEqual({ type: 'Point', coordinates: [2, 1] });
-      expect(saved.images).toBeUndefined();
-      expect(res.images).toHaveLength(1);
       expect(res.location).toEqual({ lat: 1, lng: 2 });
     });
     it('invalida ambos barrios si cambia de barrio', async () => {
@@ -489,83 +468,6 @@ describe('ProductService', () => {
 
       // Assert
       expect(productRepo.update).toHaveBeenCalled();
-    });
-  });
-
-  // ───────── addImages ─────────
-  describe('addImages', () => {
-    const owned = (images: Partial<ProductImage>[] = []) =>
-      productRepo.findOne.mockResolvedValue(makeProduct({ images: images as ProductImage[] }));
-
-    it('400 sin archivos', async () => {
-      // Arrange
-
-      // Act
-
-      // Assert
-      await expect(service.addImages('p1', 'seller-1', [])).rejects.toBeInstanceOf(BadRequestException);
-      await expect(service.addImages('p1', 'seller-1', undefined as any)).rejects.toBeInstanceOf(BadRequestException);
-    });
-    it('403 si no es el dueño', async () => {
-      // Arrange
-      owned();
-
-      // Act
-
-      // Assert
-      await expect(service.addImages('p1', 'otro', [file()])).rejects.toBeInstanceOf(ForbiddenException);
-    });
-    it('409 si no está AVAILABLE', async () => {
-      // Arrange
-      productRepo.findOne.mockResolvedValue(makeProduct({ status: ProductStatus.SOLD }));
-
-      // Act
-
-      // Assert
-      await expect(service.addImages('p1', 'seller-1', [file()])).rejects.toBeInstanceOf(ConflictException);
-    });
-    it('400 si supera el máximo de imágenes', async () => {
-      // Arrange
-      owned(Array.from({ length: 8 }, (_, i) => ({ position: i })));
-
-      // Act
-
-      // Assert
-      await expect(service.addImages('p1', 'seller-1', [file()])).rejects.toBeInstanceOf(BadRequestException);
-    });
-    it('guarda las imágenes con posiciones consecutivas', async () => {
-      // Arrange
-      owned([{ position: 0 }, { position: 4 }]);
-      storage.saveProductImage.mockResolvedValueOnce('/uploads/products/a.jpg').mockResolvedValueOnce('/uploads/products/b.jpg');
-
-      // Act
-      const res = await service.addImages('p1', 'seller-1', [file('a.jpg'), file('b.jpg')]);
-
-      // Assert
-      expect(res.map((i) => i.position)).toEqual([5, 6]);
-      expect(res.map((i) => i.url)).toEqual(['/uploads/products/a.jpg', '/uploads/products/b.jpg']);
-    });
-    it('empieza en la posición 0 si no hay imágenes', async () => {
-      // Arrange
-      owned();
-      storage.saveProductImage.mockResolvedValue('/uploads/products/a.jpg');
-
-      // Act
-      const res = await service.addImages('p1', 'seller-1', [file()]);
-
-      // Assert
-      expect(res[0].position).toBe(0);
-    });
-    it('borra los archivos ya guardados si falla la operación', async () => {
-      // Arrange
-      owned();
-      storage.saveProductImage.mockResolvedValueOnce('/uploads/products/a.jpg').mockRejectedValueOnce(new BadRequestException('mala'));
-
-      // Act
-
-      // Assert
-      await expect(service.addImages('p1', 'seller-1', [file(), file()])).rejects.toBeInstanceOf(BadRequestException);
-      expect(storage.delete).toHaveBeenCalledWith('/uploads/products/a.jpg');
     });
   });
 

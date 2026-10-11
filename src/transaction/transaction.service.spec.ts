@@ -20,7 +20,6 @@ const makeProduct = (over: any = {}) => ({
   location: { type: 'Point', coordinates: [-76.5, 3.4] },
   neighborhoodId: 'granada',
   estimatedWeightKg: 10,
-  images: [],
   viewsCount: 0,
   createdAt: new Date(),
   updatedAt: new Date(),

@@ -15,7 +15,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     configService: ConfigService,
   ) {
     super({
-      secretOrKey: configService.get<string>('JWT_SECRET') as string,
+      secretOrKey: configService.getOrThrow<string>('JWT_SECRET'),
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     });
   }
@@ -24,7 +24,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const user = await this.userRepository.findOneBy({ id: payload.id });
     if (!user) throw new UnauthorizedException('Token not valid');
     if (!user.isActive) throw new UnauthorizedException('User is not active');
-    delete user.password;
     return user;
   }
 }

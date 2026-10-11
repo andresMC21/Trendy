@@ -3,11 +3,22 @@ import {
   ExecutionContext,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { Request } from 'express';
+import { User } from '../entities/user.entity';
 
+/** Devuelve el usuario que Passport dejó en `request.user` (requiere @Auth()). */
 export const GetUser = createParamDecorator(
-  (data: string | undefined, context: ExecutionContext) => {
-    const user = context.switchToHttp().getRequest().user;
-    if (!user) throw new InternalServerErrorException("User doesn't exist");
-    return data ? user[data] : user;
+  (_data: unknown, context: ExecutionContext): User => {
+    const { user } = context
+      .switchToHttp()
+      .getRequest<Request & { user?: User }>();
+
+    if (!user) {
+      throw new InternalServerErrorException(
+        'User not found in request (is the route missing @Auth()?)',
+      );
+    }
+
+    return user;
   },
 );

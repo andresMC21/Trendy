@@ -14,7 +14,7 @@ services:
     branch: main
     buildCommand: npm install --include=dev && npm run build
     startCommand: npm run migration:run:prod && npm run start:prod
-    healthCheckPath: /health
+    healthCheckPath: /api/health
     envVars:
       - key: DATABASE_URL
         fromDatabase:

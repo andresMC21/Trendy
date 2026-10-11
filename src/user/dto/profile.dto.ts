@@ -17,7 +17,7 @@ export class UserProfileDto {
   photoUrl: string | null;
 
   @Expose()
-  description: string | null;
+  info: string | null;
 
   @Expose()
   role: ValidRoles[];

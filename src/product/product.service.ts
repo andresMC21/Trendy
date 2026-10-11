@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { GeoPoint, toGeoJson } from './interfaces/geo.interface';
 import { PaginatedResult } from './interfaces/paginated-result.interface';
 import { ValidRoles } from '../user/enums/valid-roles.enum';
@@ -17,15 +17,12 @@ import { FindProductsQueryDto } from './dto/find-products-query.dto';
 import {
   ProductDetailDto,
   ProductDto,
-  ProductImageDto,
 } from './dto/product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ProductImage } from './entities/product-image.entity';
 import { Product } from './entities/product.entity';
 import { ProductSort } from './enums/product-sort.enum';
 import { ProductStatus } from './enums/product-status.enum';
-import { MAX_IMAGES_PER_PRODUCT } from './storage/image-upload.options';
-import { StorageService } from './storage/storage.service';
+
 
 /** Transiciones de estado válidas (las usa TransactionService vía updateStatus). */
 const ALLOWED_STATUS_TRANSITIONS: Record<ProductStatus, ProductStatus[]> = {
@@ -60,9 +57,6 @@ export class ProductService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
-    @InjectRepository(ProductImage)
-    private readonly imageRepository: Repository<ProductImage>,
-    private readonly storage: StorageService,
     config: ConfigService,
   ) {
     this.feedCacheTtlMs =
@@ -134,7 +128,6 @@ export class ProductService {
       .limit(limit)
       .getRawAndEntities();
 
-    await this.attachImages(entities);
     const counts = await this.countFavorites(entities.map((p) => p.id));
 
     const items = entities.map((product, i) =>
@@ -155,7 +148,6 @@ export class ProductService {
   async findOne(id: string): Promise<ProductDetailDto> {
     const product = await this.productRepository
       .createQueryBuilder('product')
-      .leftJoinAndSelect('product.images', 'images')
       .leftJoin('product.seller', 'seller')
       .addSelect([
         'seller.id',
@@ -165,7 +157,6 @@ export class ProductService {
         'seller.reviewsCount',
       ])
       .where('product.id = :id', { id })
-      .orderBy('images.position', 'ASC')
       .getOne();
 
     if (!product || product.status === ProductStatus.REMOVED) {
@@ -231,7 +222,6 @@ export class ProductService {
       location: toGeoJson(location),
     });
     const saved = await this.productRepository.save(product);
-    saved.images = [];
     await this.invalidateFeedCache(saved.neighborhoodId);
     return ProductDto.fromEntity(saved);
   }
@@ -242,7 +232,7 @@ export class ProductService {
     userId: string,
     dto: UpdateProductDto,
   ): Promise<ProductDto> {
-    const product = await this.getActiveWithImages(id);
+    const product = await this.getActive(id);
     this.assertOwnership(product, userId);
     if (product.status !== ProductStatus.AVAILABLE) {
       throw new ConflictException(
@@ -255,11 +245,7 @@ export class ProductService {
     Object.assign(product, rest);
     if (location) product.location = toGeoJson(location);
 
-    // images tiene cascade; se detacha para no reescribirlas al guardar
-    const images = product.images;
-    delete (product as Partial<Product>).images;
     const saved = await this.productRepository.save(product);
-    saved.images = images;
 
     await this.invalidateFeedCache(previousNeighborhood);
     if (saved.neighborhoodId !== previousNeighborhood) {
@@ -293,47 +279,6 @@ export class ProductService {
     await this.invalidateFeedCache(product.neighborhoodId);
   }
 
-  /** POST /products/:id/images */
-  async addImages(
-    id: string,
-    userId: string,
-    files: Express.Multer.File[],
-  ): Promise<ProductImageDto[]> {
-    if (!files || files.length === 0) {
-      throw new BadRequestException('Debes enviar al menos una imagen en el campo "files"');
-    }
-    const product = await this.getActiveWithImages(id);
-    this.assertOwnership(product, userId);
-    if (product.status !== ProductStatus.AVAILABLE) {
-      throw new ConflictException(
-        `No se pueden agregar imágenes a un producto en estado ${product.status}`,
-      );
-    }
-    if (product.images.length + files.length > MAX_IMAGES_PER_PRODUCT) {
-      throw new BadRequestException(
-        `Un producto admite máximo ${MAX_IMAGES_PER_PRODUCT} imágenes (ya tiene ${product.images.length})`,
-      );
-    }
-
-    const urls: string[] = [];
-    try {
-      for (const file of files) urls.push(await this.storage.saveProductImage(file));
-      const nextPosition = product.images.length
-        ? Math.max(...product.images.map((i) => i.position)) + 1
-        : 0;
-      const saved = await this.imageRepository.save(
-        urls.map((url, i) =>
-          this.imageRepository.create({ productId: id, url, position: nextPosition + i }),
-        ),
-      );
-      await this.invalidateFeedCache(product.neighborhoodId);
-      return saved.map(ProductImageDto.fromEntity);
-    } catch (error) {
-      // No dejar archivos huérfanos si algo falló a mitad de camino
-      await Promise.all(urls.map((u) => this.storage.delete(u)));
-      throw error;
-    }
-  }
 
   /** POST /products/:id/favorite — alterna favorito. */
   async toggleFavorite(
@@ -453,28 +398,14 @@ export class ProductService {
     qb.addOrderBy('product.id', 'ASC'); // desempate estable para paginar
   }
 
-  private async getActiveWithImages(id: string): Promise<Product> {
-    const product = await this.productRepository.findOne({
-      where: { id },
-      relations: { images: true },
-      order: { images: { position: 'ASC' } },
-    });
+    private async getActive(id: string): Promise<Product> {
+    const product = await this.productRepository.findOne({ where: { id } });
     if (!product || product.status === ProductStatus.REMOVED) {
       throw new NotFoundException(`Product with id ${id} not found`);
     }
     return product;
   }
 
-  private async attachImages(products: Product[]): Promise<void> {
-    if (products.length === 0) return;
-    const images = await this.imageRepository.find({
-      where: { productId: In(products.map((p) => p.id)) },
-      order: { position: 'ASC' },
-    });
-    for (const product of products) {
-      product.images = images.filter((i) => i.productId === product.id);
-    }
-  }
 
   private async countFavorites(ids: string[]): Promise<Map<string, number>> {
     const result = new Map<string, number>();

@@ -12,9 +12,8 @@ services:
     plan: free
     region: oregon
     branch: main
-    autoDeployTrigger: off
-    buildCommand: npm ci --include=dev && npm run build
-    startCommand: npm run start:prod
+    buildCommand: npm install --include=dev && npm run build
+    startCommand: npm run migration:run:prod && npm run start:prod
     healthCheckPath: /api/health
     envVars:
       - key: NODE_VERSION
@@ -26,4 +25,4 @@ services:
       - key: NODE_ENV
         value: production
       - key: TYPEORM_SYNCHRONIZE
-        value: 'true'
+        value: 'false'

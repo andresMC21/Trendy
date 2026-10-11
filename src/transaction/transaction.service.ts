@@ -21,7 +21,10 @@ const ACTIVE_TRANSACTION_STATUSES = [
   TransactionStatus.AGREED_POINT,
 ];
 
-const ALLOWED_STATUS_TRANSITIONS: Record<TransactionStatus, TransactionStatus[]> = {
+const ALLOWED_STATUS_TRANSITIONS: Record<
+  TransactionStatus,
+  TransactionStatus[]
+> = {
   [TransactionStatus.PENDING]: [
     TransactionStatus.AGREED_POINT,
     TransactionStatus.CANCELLED,
@@ -46,13 +49,19 @@ export class TransactionService {
     buyerId: string,
     createTransactionDto: CreateTransactionDto,
   ): Promise<TransactionDto> {
-    const product = await this.productService.findById(createTransactionDto.productId);
+    const product = await this.productService.findById(
+      createTransactionDto.productId,
+    );
 
     if (product.sellerId === buyerId) {
-      throw new ForbiddenException('No puedes iniciar una transaccion sobre tu propio producto');
+      throw new ForbiddenException(
+        'No puedes iniciar una transaccion sobre tu propio producto',
+      );
     }
     if (product.status !== ProductStatus.AVAILABLE) {
-      throw new ConflictException(`El producto no esta disponible: ${product.status}`);
+      throw new ConflictException(
+        `El producto no esta disponible: ${product.status}`,
+      );
     }
 
     const active = await this.transactionRepository.findOne({
@@ -62,7 +71,9 @@ export class TransactionService {
       },
     });
     if (active) {
-      throw new ConflictException('El producto ya tiene una transaccion activa');
+      throw new ConflictException(
+        'El producto ya tiene una transaccion activa',
+      );
     }
 
     const transaction = this.transactionRepository.create({
@@ -78,7 +89,10 @@ export class TransactionService {
       saved.product = product;
       return TransactionDto.fromEntity(saved);
     } catch (error) {
-      await this.productService.updateStatus(product.id, ProductStatus.AVAILABLE);
+      await this.productService.updateStatus(
+        product.id,
+        ProductStatus.AVAILABLE,
+      );
       throw error;
     }
   }
@@ -87,13 +101,15 @@ export class TransactionService {
     const transactions = await this.transactionRepository.find({
       where: [{ buyerId: userId }, { sellerId: userId }],
       relations: {
-        product: { images: true },
+        product: true,
         buyer: true,
         seller: true,
       },
       order: { updatedAt: 'DESC' },
     });
-    return transactions.map(TransactionDto.fromEntity);
+    return transactions.map((transaction) =>
+      TransactionDto.fromEntity(transaction),
+    );
   }
 
   async findOne(id: string, userId: string): Promise<TransactionDto> {
@@ -115,17 +131,25 @@ export class TransactionService {
       updateTransactionDto.status === TransactionStatus.AGREED_POINT &&
       (!transaction.safePointId || !transaction.scheduledTime)
     ) {
-      throw new BadRequestException('Confirma un punto seguro antes de pasar a AGREED_POINT');
+      throw new BadRequestException(
+        'Confirma un punto seguro antes de pasar a AGREED_POINT',
+      );
     }
 
     transaction.status = updateTransactionDto.status;
     const saved = await this.transactionRepository.save(transaction);
 
     if (saved.status === TransactionStatus.COMPLETED) {
-      await this.productService.updateStatus(saved.productId, ProductStatus.SOLD);
+      await this.productService.updateStatus(
+        saved.productId,
+        ProductStatus.SOLD,
+      );
     }
     if (saved.status === TransactionStatus.CANCELLED) {
-      await this.productService.updateStatus(saved.productId, ProductStatus.AVAILABLE);
+      await this.productService.updateStatus(
+        saved.productId,
+        ProductStatus.AVAILABLE,
+      );
     }
 
     return TransactionDto.fromEntity(saved);
@@ -140,12 +164,16 @@ export class TransactionService {
     this.assertParticipant(transaction, userId);
 
     if (transaction.status !== TransactionStatus.PENDING) {
-      throw new ConflictException('Solo transacciones PENDING pueden confirmar punto');
+      throw new ConflictException(
+        'Solo transacciones PENDING pueden confirmar punto',
+      );
     }
 
     const scheduledTime = new Date(confirmPointDto.scheduledTime);
     if (Number.isNaN(scheduledTime.getTime())) {
-      throw new BadRequestException('scheduledTime debe ser una fecha ISO valida');
+      throw new BadRequestException(
+        'scheduledTime debe ser una fecha ISO valida',
+      );
     }
 
     transaction.safePointId = confirmPointDto.safePointId;
@@ -160,7 +188,7 @@ export class TransactionService {
     const transaction = await this.transactionRepository.findOne({
       where: { id },
       relations: {
-        product: { images: true },
+        product: true,
         buyer: true,
         seller: true,
       },
@@ -173,14 +201,21 @@ export class TransactionService {
 
   private assertParticipant(transaction: Transaction, userId: string): void {
     if (transaction.buyerId !== userId && transaction.sellerId !== userId) {
-      throw new ForbiddenException('Solo los participantes pueden ver o modificar esta transaccion');
+      throw new ForbiddenException(
+        'Solo los participantes pueden ver o modificar esta transaccion',
+      );
     }
   }
 
-  private assertTransition(from: TransactionStatus, to: TransactionStatus): void {
+  private assertTransition(
+    from: TransactionStatus,
+    to: TransactionStatus,
+  ): void {
     if (from === to) return;
     if (!ALLOWED_STATUS_TRANSITIONS[from].includes(to)) {
-      throw new ConflictException(`Transicion de estado invalida: ${from} -> ${to}`);
+      throw new ConflictException(
+        `Transicion de estado invalida: ${from} -> ${to}`,
+      );
     }
   }
 }

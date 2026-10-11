@@ -21,7 +21,7 @@ export class Transaction {
   @Column({ type: 'uuid' })
   productId: string;
 
-  @ManyToOne(() => Product, { nullable: false, onDelete: 'CASCADE' })
+  @ManyToOne(() => Product, { nullable: false, onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'productId' })
   product: Product;
 
@@ -29,7 +29,7 @@ export class Transaction {
   @Column({ type: 'varchar' })
   buyerId: string;
 
-  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
+  @ManyToOne(() => User, { nullable: false, onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'buyerId' })
   buyer: User;
 
@@ -37,7 +37,7 @@ export class Transaction {
   @Column({ type: 'varchar' })
   sellerId: string;
 
-  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
+  @ManyToOne(() => User, { nullable: false, onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'sellerId' })
   seller: User;
 

@@ -12,5 +12,5 @@ export class UpdateUserDto extends PartialType(
   @IsOptional()
   @IsString()
   @MaxLength(300)
-  description?: string;
+  info?: string;
 }

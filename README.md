@@ -28,11 +28,10 @@ Pruebas: `npm test` (unitarias) · `npm run test:cov` (cobertura) ·
 | Método | Ruta | Auth | Descripción |
 |---|---|---|---|
 | GET | `/api/products` | No | Feed paginado de productos `AVAILABLE`. Query: `neighborhood`, `lat`, `lng`, `radius` (km, def. 5), `category`, `condition`, `sort` (`recent`·`price_asc`·`price_desc`·`distance`·`popular`), `page`, `limit` |
-| GET | `/api/products/:id` | No | Detalle con vendedor e imágenes; suma una visita |
+| GET | `/api/products/:id` | No | Detalle con vendedor; suma una visita |
 | POST | `/api/products` | JWT | Publicar producto |
 | PUT | `/api/products/:id` | JWT (dueño) | Editar (solo si está `AVAILABLE`) |
 | DELETE | `/api/products/:id` | JWT (dueño, ADMIN o MODERATOR) | Borrado lógico (`REMOVED`); solo si está `AVAILABLE` |
-| POST | `/api/products/:id/images` | JWT (dueño) | Subir imágenes (`multipart`, campo `files`, máx. 8, JPG/PNG/WEBP, 5 MB c/u) |
 | POST | `/api/products/:id/favorite` | JWT | Marca / desmarca favorito |
 
 Swagger documenta todos los endpoints en `/api` (botón *Authorize* con el JWT).

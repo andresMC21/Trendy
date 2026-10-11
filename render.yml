@@ -16,6 +16,8 @@ services:
     startCommand: npm run migration:run:prod && npm run start:prod
     healthCheckPath: /api/health
     envVars:
+      - key: NODE_VERSION
+        value: '24'
       - key: DATABASE_URL
         fromDatabase:
           name: trendy-app-db

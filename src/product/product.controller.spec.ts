@@ -82,7 +82,9 @@ describe('ProductController', () => {
     await controller.remove(productId, user);
 
     // Assert
-    expect(service.remove).toHaveBeenCalledWith(productId, 'u1', [ValidRoles.USER]);
+    expect(service.remove).toHaveBeenCalledWith(productId, 'u1', [
+      ValidRoles.USER,
+    ]);
   });
 
   it('toggleFavorite', async () => {

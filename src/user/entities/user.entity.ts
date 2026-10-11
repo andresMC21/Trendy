@@ -1,11 +1,11 @@
-import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { VerificationStatus } from '../enums/verification-status';
 import { ValidRoles } from '../enums/valid-roles.enum';
 
 @Entity()
 export class User {
 
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn('uuid')
     id: string;
 
     @Column({
@@ -15,7 +15,8 @@ export class User {
     email: string;
 
     @Column({
-        type: "text"
+        type: "text",
+        select: false
     })
     password?: string;
 
@@ -34,19 +35,13 @@ export class User {
         type: "text",
         nullable: true
     })
-    info?: string;
+    info: string | null;
 
     @Column({
         type: "text",
         default: VerificationStatus.UNVERIFIED
     })
     verificationStatus: VerificationStatus;
-
-    @Column({
-        type: "text",
-        nullable: true
-    })
-    identityDocumentUrl?: string;
 
     @Column({
         type: "float",
@@ -69,13 +64,14 @@ export class User {
     @CreateDateColumn()
     createdAt: Date;
 
-    @CreateDateColumn()
+    @UpdateDateColumn()
     updatedAt: Date;
 
     @Column({
-        type: 'text',
+        type: 'enum',
+        enum: ValidRoles,
         array: true,
-        default: ['USER']
+        default: [ValidRoles.USER]
     })
     role: ValidRoles[];
 

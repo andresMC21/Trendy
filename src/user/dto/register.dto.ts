@@ -1,13 +1,11 @@
+import { Transform } from 'class-transformer';
 import { IsEmail, IsString, MaxLength, MinLength } from "class-validator"
 
 export class RegisterUserDto {
 
-    @IsString()
-    @MinLength(8)
-    @MaxLength(10)
-    id: string;
-
-    @IsString()
+    @Transform(({ value }: { value: unknown }) =>
+        typeof value === 'string' ? value.toLowerCase().trim() : value,
+    )
     @IsEmail()
     email: string;
 

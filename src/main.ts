@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { join } from 'path';
 import { AppModule } from './app.module';
 
 // Capture errors that happen before NestJS initializes its logger.
@@ -35,11 +34,6 @@ async function bootstrap() {
         transform: true,
       }),
     );
-
-    // Uploaded files stored locally; UPLOADS_DIR can override the default directory.
-    app.useStaticAssets(join(process.cwd(), process.env.UPLOADS_DIR ?? 'uploads'), {
-      prefix: '/uploads',
-    });
 
     // Swagger documentation
     const swaggerConfig = new DocumentBuilder()

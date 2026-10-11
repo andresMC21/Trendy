@@ -7,7 +7,6 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   ValueTransformer,
@@ -16,7 +15,6 @@ import type { GeoJsonPoint } from '../interfaces/geo.interface';
 import { User } from '../../user/entities/user.entity';
 import { ProductCondition } from '../enums/product-condition.enum';
 import { ProductStatus } from '../enums/product-status.enum';
-import { ProductImage } from './product-image.entity';
 
 /** Postgres devuelve `numeric` como string; esto lo convierte a number. */
 const numericTransformer: ValueTransformer = {
@@ -79,8 +77,6 @@ export class Product {
   @Column({ type: 'numeric', precision: 8, scale: 2, nullable: true, transformer: numericTransformer })
   estimatedWeightKg: number | null;
 
-  @OneToMany(() => ProductImage, (image) => image.product, { cascade: true })
-  images: ProductImage[];
 
   /** Usuarios que marcaron el producto como favorito (N:M) */
   @ManyToMany(() => User)

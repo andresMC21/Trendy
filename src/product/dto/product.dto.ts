@@ -1,20 +1,9 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { fromGeoJson } from '../interfaces/geo.interface';
 import { Product } from '../entities/product.entity';
-import { ProductImage } from '../entities/product-image.entity';
 import { ProductCondition } from '../enums/product-condition.enum';
 import { ProductStatus } from '../enums/product-status.enum';
 import { GeoPointDto } from './geo-point.dto';
-
-export class ProductImageDto {
-  @ApiProperty({ format: 'uuid' }) id: string;
-  @ApiProperty({ example: '/uploads/products/3f2a.jpg' }) url: string;
-  @ApiProperty({ example: 0 }) position: number;
-
-  static fromEntity(image: ProductImage): ProductImageDto {
-    return { id: image.id, url: image.url, position: image.position };
-  }
-}
 
 export class ProductDto {
   @ApiProperty({ format: 'uuid' }) id: string;
@@ -29,7 +18,6 @@ export class ProductDto {
   @ApiProperty({ type: GeoPointDto }) location: GeoPointDto;
   @ApiProperty() neighborhoodId: string;
   @ApiProperty({ nullable: true, type: Number }) estimatedWeightKg: number | null;
-  @ApiProperty({ type: [ProductImageDto] }) images: ProductImageDto[];
   @ApiProperty({ example: 3 }) favoritesCount: number;
   @ApiProperty({ example: 10 }) viewsCount: number;
   @ApiPropertyOptional({ example: 1.37, description: 'Distancia en km (solo si se envió lat/lng)' })
@@ -54,10 +42,6 @@ export class ProductDto {
     dto.location = fromGeoJson(product.location);
     dto.neighborhoodId = product.neighborhoodId;
     dto.estimatedWeightKg = product.estimatedWeightKg ?? null;
-    dto.images = (product.images ?? [])
-      .slice()
-      .sort((a, b) => a.position - b.position)
-      .map(ProductImageDto.fromEntity);
     dto.favoritesCount = extra.favoritesCount ?? 0;
     dto.viewsCount = product.viewsCount;
     if (extra.distanceKm !== undefined) dto.distanceKm = extra.distanceKm;

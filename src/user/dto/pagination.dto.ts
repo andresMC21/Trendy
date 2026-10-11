@@ -12,7 +12,6 @@ export class PaginationDto {
 
   @IsOptional()
   @Type(() => Number)
-  @IsPositive()
   @IsInt()
   @Min(0)
   skip: number = 0;

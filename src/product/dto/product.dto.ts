@@ -28,11 +28,15 @@ export class ProductDto {
   @ApiProperty({ enum: ProductStatus }) status: ProductStatus;
   @ApiProperty({ type: GeoPointDto }) location: GeoPointDto;
   @ApiProperty() neighborhoodId: string;
-  @ApiProperty({ nullable: true, type: Number }) estimatedWeightKg: number | null;
+  @ApiProperty({ nullable: true, type: Number }) estimatedWeightKg:
+    number | null;
   @ApiProperty({ type: [ProductImageDto] }) images: ProductImageDto[];
   @ApiProperty({ example: 3 }) favoritesCount: number;
   @ApiProperty({ example: 10 }) viewsCount: number;
-  @ApiPropertyOptional({ example: 1.37, description: 'Distancia en km (solo si se envió lat/lng)' })
+  @ApiPropertyOptional({
+    example: 1.37,
+    description: 'Distancia en km (solo si se envió lat/lng)',
+  })
   distanceKm?: number;
   @ApiProperty() createdAt: Date;
   @ApiProperty() updatedAt: Date;
@@ -57,7 +61,7 @@ export class ProductDto {
     dto.images = (product.images ?? [])
       .slice()
       .sort((a, b) => a.position - b.position)
-      .map(ProductImageDto.fromEntity);
+      .map((image) => ProductImageDto.fromEntity(image));
     dto.favoritesCount = extra.favoritesCount ?? 0;
     dto.viewsCount = product.viewsCount;
     if (extra.distanceKm !== undefined) dto.distanceKm = extra.distanceKm;

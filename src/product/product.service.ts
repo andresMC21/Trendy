@@ -192,7 +192,8 @@ export class ProductService {
   /** Uso interno (TransactionService): devuelve la entidad, incluso si está SOLD/REMOVED. */
   async findById(id: string): Promise<Product> {
     const product = await this.productRepository.findOneBy({ id });
-    if (!product) throw new NotFoundException(`Product with id ${id} not found`);
+    if (!product)
+      throw new NotFoundException(`Product with id ${id} not found`);
     return product;
   }
 
@@ -266,7 +267,9 @@ export class ProductService {
       await this.invalidateFeedCache(saved.neighborhoodId);
     }
     const counts = await this.countFavorites([id]);
-    return ProductDto.fromEntity(saved, { favoritesCount: counts.get(id) ?? 0 });
+    return ProductDto.fromEntity(saved, {
+      favoritesCount: counts.get(id) ?? 0,
+    });
   }
 
   /**
@@ -289,7 +292,10 @@ export class ProductService {
         `No se puede eliminar un producto en estado ${product.status}`,
       );
     }
-    await this.productRepository.update({ id }, { status: ProductStatus.REMOVED });
+    await this.productRepository.update(
+      { id },
+      { status: ProductStatus.REMOVED },
+    );
     await this.invalidateFeedCache(product.neighborhoodId);
   }
 
@@ -300,7 +306,9 @@ export class ProductService {
     files: Express.Multer.File[],
   ): Promise<ProductImageDto[]> {
     if (!files || files.length === 0) {
-      throw new BadRequestException('Debes enviar al menos una imagen en el campo "files"');
+      throw new BadRequestException(
+        'Debes enviar al menos una imagen en el campo "files"',
+      );
     }
     const product = await this.getActiveWithImages(id);
     this.assertOwnership(product, userId);
@@ -317,17 +325,22 @@ export class ProductService {
 
     const urls: string[] = [];
     try {
-      for (const file of files) urls.push(await this.storage.saveProductImage(file));
+      for (const file of files)
+        urls.push(await this.storage.saveProductImage(file));
       const nextPosition = product.images.length
         ? Math.max(...product.images.map((i) => i.position)) + 1
         : 0;
       const saved = await this.imageRepository.save(
         urls.map((url, i) =>
-          this.imageRepository.create({ productId: id, url, position: nextPosition + i }),
+          this.imageRepository.create({
+            productId: id,
+            url,
+            position: nextPosition + i,
+          }),
         ),
       );
       await this.invalidateFeedCache(product.neighborhoodId);
-      return saved.map(ProductImageDto.fromEntity);
+      return saved.map((image) => ProductImageDto.fromEntity(image));
     } catch (error) {
       // No dejar archivos huérfanos si algo falló a mitad de camino
       await Promise.all(urls.map((u) => this.storage.delete(u)));
@@ -382,12 +395,16 @@ export class ProductService {
 
   assertOwnership(product: Product, userId: string): void {
     if (product.sellerId !== userId) {
-      throw new ForbiddenException('Solo el vendedor puede modificar este producto');
+      throw new ForbiddenException(
+        'Solo el vendedor puede modificar este producto',
+      );
     }
   }
 
   private canModerate(roles: ValidRoles[]): boolean {
-    return roles.includes(ValidRoles.ADMIN) || roles.includes(ValidRoles.MODERATOR);
+    return (
+      roles.includes(ValidRoles.ADMIN) || roles.includes(ValidRoles.MODERATOR)
+    );
   }
 
   // ───────────────────────── Caché del feed ─────────────────────────
@@ -413,7 +430,10 @@ export class ProductService {
    */
   async invalidateFeedCache(neighborhoodId: string): Promise<void> {
     for (const key of this.feedCache.keys()) {
-      if (key.startsWith(`feed:${neighborhoodId}:`) || key.startsWith('feed:all:')) {
+      if (
+        key.startsWith(`feed:${neighborhoodId}:`) ||
+        key.startsWith('feed:all:')
+      ) {
         this.feedCache.delete(key);
       }
     }
@@ -425,7 +445,10 @@ export class ProductService {
       const oldest = this.feedCache.keys().next().value;
       if (oldest !== undefined) this.feedCache.delete(oldest);
     }
-    this.feedCache.set(key, { value, expiresAt: Date.now() + this.feedCacheTtlMs });
+    this.feedCache.set(key, {
+      value,
+      expiresAt: Date.now() + this.feedCacheTtlMs,
+    });
   }
 
   // ───────────────────────── Helpers ─────────────────────────

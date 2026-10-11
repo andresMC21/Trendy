@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
@@ -7,14 +6,8 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
-  UploadedFile,
-  UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { randomUUID } from 'crypto';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Auth } from './decorators/auth.decorator';
 import { GetUser } from './decorators/get-user.decorator';
 import { ChangeEmailDto } from './dto/changeEmail.dto';
@@ -25,47 +18,21 @@ import { UpdateUserDto } from './dto/update.dto';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 
-// Almacenamiento provisional en disco. En Render (plan gratuito) el disco es
-// efímero: migrar a almacenamiento externo privado antes de producción.
-const verificationUpload = {
-  storage: diskStorage({
-    destination: 'uploads/identity-documents',
-    filename: (_req, file, callback) =>
-      callback(null, `${randomUUID()}${extname(file.originalname).toLowerCase()}`),
-  }),
-  limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: (
-    _req: unknown,
-    file: Express.Multer.File,
-    callback: (error: Error | null, acceptFile: boolean) => void,
-  ) => {
-    const allowed = ['image/jpeg', 'image/png', 'application/pdf'];
-    if (allowed.includes(file.mimetype)) {
-      callback(null, true);
-    } else {
-      callback(
-        new BadRequestException('Only JPG, PNG or PDF files are allowed'),
-        false,
-      );
-    }
-  },
-};
-
 @ApiTags('Users')
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) { }
+  constructor(private readonly userService: UserService) {}
 
   // TODO(Camilo): endpoints temporales de register/login para poder probar
-  // los demás módulos. Reemplazar por los definitivos del módulo 1.
+  // los demas modulos. Reemplazar por los definitivos del modulo 1.
   @Post('register')
-  @ApiOperation({ summary: 'Registrar usuario (temporal, módulo 1)' })
+  @ApiOperation({ summary: 'Registrar usuario (temporal, modulo 1)' })
   register(@Body() dto: RegisterUserDto) {
     return this.userService.create(dto);
   }
 
   @Post('login')
-  @ApiOperation({ summary: 'Iniciar sesión (temporal, módulo 1)' })
+  @ApiOperation({ summary: 'Iniciar sesion (temporal, modulo 1)' })
   login(@Body() dto: LoginUserDto) {
     return this.userService.login(dto);
   }
@@ -82,7 +49,8 @@ export class UserController {
   @Patch('me')
   @Auth()
   @ApiOperation({
-    summary: 'Editar fullName, photoUrl e info (fullName bloqueado si está verificado o en revisión)',
+    summary:
+      'Editar fullName, photoUrl e info (fullName bloqueado si esta verificado o en revision)',
   })
   updateMe(@GetUser() user: User, @Body() dto: UpdateUserDto) {
     return this.userService.updateMe(user, dto);
@@ -90,21 +58,25 @@ export class UserController {
 
   @Patch('me/password')
   @Auth()
-  @ApiOperation({ summary: 'Cambiar contraseña (requiere la contraseña actual)' })
+  @ApiOperation({
+    summary: 'Cambiar contrasena (requiere la contrasena actual)',
+  })
   changePassword(@GetUser() user: User, @Body() dto: ChangePasswordDto) {
     return this.userService.changePassword(user, dto);
   }
 
   @Patch('me/email')
   @Auth()
-  @ApiOperation({ summary: 'Cambiar email (requiere la contraseña actual)' })
+  @ApiOperation({ summary: 'Cambiar email (requiere la contrasena actual)' })
   changeEmail(@GetUser() user: User, @Body() dto: ChangeEmailDto) {
     return this.userService.changeEmail(user, dto);
   }
 
   @Post('me/verification')
   @Auth()
-  @ApiOperation({ summary: 'Solicitar verificación de identidad (estado PENDING)' })
+  @ApiOperation({
+    summary: 'Solicitar verificacion de identidad (estado PENDING)',
+  })
   requestVerification(@GetUser() user: User) {
     return this.userService.requestVerification(user);
   }

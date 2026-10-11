@@ -1,3 +1,4 @@
+import { PassportModule } from '@nestjs/passport';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TransactionStatus } from './enums/transaction-status.enum';
 import { TransactionController } from './transaction.controller';
@@ -16,16 +17,17 @@ describe('TransactionController', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     const module: TestingModule = await Test.createTestingModule({
+      imports: [PassportModule],
       controllers: [TransactionController],
-      providers: [{ provide: TransactionService, useValue: transactionService }],
+      providers: [
+        { provide: TransactionService, useValue: transactionService },
+      ],
     }).compile();
 
     controller = module.get<TransactionController>(TransactionController);
   });
 
   it('should be defined', () => {
-    // Arrange
-    // Act
     // Assert
     expect(controller).toBeDefined();
   });
@@ -57,6 +59,19 @@ describe('TransactionController', () => {
     expect(transactionService.findAll).toHaveBeenCalledWith('buyer-1');
   });
 
+  it('findOne delega id y usuario autenticado', async () => {
+    // Arrange
+    const user = { id: 'buyer-1' } as any;
+    transactionService.findOne.mockResolvedValue('detail');
+
+    // Act
+    const result = await controller.findOne('t1', user);
+
+    // Assert
+    expect(result).toBe('detail');
+    expect(transactionService.findOne).toHaveBeenCalledWith('t1', 'buyer-1');
+  });
+
   it('updateStatus delega id, usuario y estado', async () => {
     // Arrange
     const user = { id: 'seller-1' } as any;
@@ -68,7 +83,11 @@ describe('TransactionController', () => {
 
     // Assert
     expect(result).toBe('updated');
-    expect(transactionService.update).toHaveBeenCalledWith('t1', 'seller-1', dto);
+    expect(transactionService.update).toHaveBeenCalledWith(
+      't1',
+      'seller-1',
+      dto,
+    );
   });
 
   it('confirmPoint delega id, usuario y punto seguro', async () => {
@@ -82,6 +101,10 @@ describe('TransactionController', () => {
 
     // Assert
     expect(result).toBe('confirmed');
-    expect(transactionService.confirmPoint).toHaveBeenCalledWith('t1', 'buyer-1', dto);
+    expect(transactionService.confirmPoint).toHaveBeenCalledWith(
+      't1',
+      'buyer-1',
+      dto,
+    );
   });
 });

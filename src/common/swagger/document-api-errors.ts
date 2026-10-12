@@ -81,6 +81,7 @@ function errorExample(statusCode: string) {
     '500': {
       statusCode: 500,
       message: 'Internal server error',
+      error: 'Internal Server Error',
     },
   };
 

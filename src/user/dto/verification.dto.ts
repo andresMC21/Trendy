@@ -2,13 +2,20 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsBoolean, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class ResolveVerification {
-  @ApiProperty({ description: 'true aprueba y false rechaza la solicitud' })
+  @ApiProperty({
+    type: Boolean,
+    example: true,
+    description: 'true aprueba la solicitud; false la rechaza.',
+  })
   @IsBoolean()
   approved: boolean;
 
   @ApiPropertyOptional({
+    type: String,
+    example: 'Documento ilegible',
     maxLength: 300,
-    description: 'Motivo registrado en los logs; no se almacena en el perfil',
+    description:
+      'Motivo de hasta 300 caracteres; se registra en logs, no en el perfil.',
   })
   @IsOptional()
   @IsString()

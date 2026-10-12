@@ -41,7 +41,7 @@ async function bootstrap() {
     const swaggerConfig = new DocumentBuilder()
       .setTitle('Trendy API')
       .setDescription(
-        'API del marketplace hiperlocal de segunda mano Trendy. Los endpoints protegidos requieren el JWT obtenido al iniciar sesión; los permisos específicos se indican en cada operación. Los errores usan un cuerpo común con statusCode, message y, normalmente, error. En los errores de validación, message es una lista de mensajes; consulta ApiErrorResponseDto para el esquema y los ejemplos.',
+        'API del marketplace hiperlocal de segunda mano Trendy. Los endpoints protegidos requieren el JWT obtenido al iniciar sesión; los permisos específicos se indican en cada operación. Las respuestas de error usan el esquema común ApiErrorResponseDto, con statusCode, message y error requeridos. En los errores de validación, message es una lista de mensajes; consulta el esquema para ver sus propiedades y ejemplos.',
       )
       .setVersion('1.0')
       .addBearerAuth(
@@ -64,14 +64,6 @@ async function bootstrap() {
     SwaggerModule.setup('/api/docs', app, document);
 
     const port = Number(process.env.PORT) || 3000;
-
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-      }),
-    );
 
     await app.listen(port, '0.0.0.0');
     console.log(`✅ Application is running on port ${port}`);

@@ -1,55 +1,106 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose, plainToInstance } from 'class-transformer';
 import { ValidRoles } from '../enums/valid-roles.enum';
 import { VerificationStatus } from '../enums/verification-status';
 import { User } from '../entities/user.entity';
 
 export class UserProfileDto {
-  @ApiProperty({ format: 'uuid' })
+  @ApiProperty({
+    type: String,
+    format: 'uuid',
+    description: 'Identificador único del usuario.',
+  })
   @Expose()
   id: string;
 
-  @ApiProperty({ format: 'email' })
+  @ApiProperty({
+    type: String,
+    format: 'email',
+    example: 'vendedor.postman@trendy.test',
+    description: 'Correo electrónico normalizado del usuario.',
+  })
   @Expose()
   email: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: String,
+    example: 'Vendedor Postman',
+    description: 'Nombre completo del usuario.',
+  })
   @Expose()
   fullName: string;
 
-  @ApiProperty({ nullable: true, type: String })
+  @ApiProperty({
+    type: String,
+    nullable: true,
+    example: 'https://example.com/vendedor.png',
+    description: 'URL de la foto de perfil o null si no está definida.',
+  })
   @Expose()
   photoUrl: string | null;
 
-  @ApiProperty({ nullable: true, type: String })
+  @ApiProperty({
+    type: String,
+    nullable: true,
+    description: 'Información adicional del perfil o null si no está definida.',
+  })
   @Expose()
   info: string | null;
 
-  @ApiProperty({ enum: ValidRoles, isArray: true })
+  @ApiProperty({
+    type: String,
+    enum: ValidRoles,
+    isArray: true,
+    example: [ValidRoles.USER],
+    description: 'Roles asignados al usuario.',
+  })
   @Expose()
   role: ValidRoles[];
 
-  @ApiProperty({ enum: VerificationStatus })
+  @ApiProperty({
+    type: String,
+    enum: VerificationStatus,
+    example: VerificationStatus.PENDING,
+    description: 'Estado actual de la verificación de identidad.',
+  })
   @Expose()
   verificationStatus: VerificationStatus;
 
-  @ApiProperty()
+  @ApiProperty({
+    type: Boolean,
+    example: true,
+    description: 'Indica si la cuenta está activa.',
+  })
   @Expose()
   isActive: boolean;
 
-  @ApiProperty({ example: 4.8 })
+  @ApiPropertyOptional({
+    type: Number,
+    description: 'Promedio de calificaciones recibidas por el usuario.',
+  })
   @Expose()
-  ratingAverage: number;
+  ratingAverage?: number;
 
-  @ApiProperty({ example: 12 })
+  @ApiProperty({
+    type: Number,
+    description: 'Cantidad de reseñas recibidas por el usuario.',
+  })
   @Expose()
   reviewsCount: number;
 
-  @ApiProperty({ type: String, format: 'date-time' })
+  @ApiProperty({
+    type: String,
+    format: 'date-time',
+    description: 'Fecha y hora de creación del usuario.',
+  })
   @Expose()
   createdAt: Date;
 
-  @ApiProperty({ type: String, format: 'date-time' })
+  @ApiProperty({
+    type: String,
+    format: 'date-time',
+    description: 'Fecha y hora de la última actualización del usuario.',
+  })
   @Expose()
   updatedAt: Date;
 

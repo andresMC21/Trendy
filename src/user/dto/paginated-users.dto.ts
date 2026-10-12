@@ -2,15 +2,29 @@ import { ApiProperty } from '@nestjs/swagger';
 import { UserProfileDto } from './profile.dto';
 
 export class PaginatedUsersDto {
-  @ApiProperty({ type: [UserProfileDto] })
+  @ApiProperty({
+    type: [UserProfileDto],
+    description: 'Usuarios incluidos en la página actual.',
+  })
   data: UserProfileDto[];
 
-  @ApiProperty({ example: 42 })
+  @ApiProperty({
+    type: Number,
+    description: 'Cantidad total de usuarios coincidentes.',
+  })
   total: number;
 
-  @ApiProperty({ example: 20 })
+  @ApiProperty({
+    type: Number,
+    example: 20,
+    description: 'Tamaño de página aplicado.',
+  })
   limit: number;
 
-  @ApiProperty({ example: 0 })
+  @ApiProperty({
+    type: Number,
+    example: 0,
+    description: 'Cantidad de usuarios omitidos.',
+  })
   skip: number;
 }

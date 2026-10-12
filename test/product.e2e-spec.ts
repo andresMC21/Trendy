@@ -32,7 +32,7 @@ describe('Products (e2e)', () => {
     const res = await http
       .post('/api/user/login')
       .send({ email: user.email, password: user.password })
-      .expect(201);
+      .expect(200);
 
     return res.body.token as string;
   };

@@ -3,13 +3,22 @@ import { IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 
 export class CreateTransactionDto {
   @ApiProperty({
+    type: String,
     format: 'uuid',
-    description: 'Id del producto sobre el que se inicia la compra o trueque.',
+    example: '{{productId}}',
+    description:
+      'Identificador UUID del producto sobre el que se inicia la compra o trueque.',
   })
   @IsUUID()
   productId: string;
 
-  @ApiPropertyOptional({ example: 'Me interesa comprarlo hoy en la tarde.' })
+  @ApiPropertyOptional({
+    type: String,
+    example: 'Me interesa, ¿sigue disponible?',
+    maxLength: 500,
+    description:
+      'Mensaje opcional que el comprador envía al vendedor (máximo 500 caracteres).',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(500)

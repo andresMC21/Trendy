@@ -101,6 +101,7 @@ describe('TransactionService', () => {
     );
     expect(transactionRepository.create).toHaveBeenCalledWith({
       productId: 'p1',
+      message: null,
       buyerId: 'buyer-1',
       sellerId: 'seller-1',
       status: TransactionStatus.PENDING,

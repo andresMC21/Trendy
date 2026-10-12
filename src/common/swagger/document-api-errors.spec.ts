@@ -54,6 +54,13 @@ describe('documentApiErrors', () => {
     ).toEqual({
       $ref: '#/components/schemas/ApiErrorResponseDto',
     });
+    expect(
+      deleteResponses?.['500']?.content?.['application/json']?.example,
+    ).toEqual({
+      statusCode: 500,
+      message: 'Internal server error',
+      error: 'Internal Server Error',
+    });
     expect(deleteResponses?.['204']?.content).toBeUndefined();
   });
 });

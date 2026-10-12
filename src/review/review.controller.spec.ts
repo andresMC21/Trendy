@@ -32,7 +32,7 @@ describe('ReviewController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('create delega con el usuario autenticado', () => {
+  it('create delega con el usuario autenticado', async () => {
     // Arrange
     const dto: CreateReviewDto = {
       transactionId: 'transaction-1',
@@ -41,42 +41,42 @@ describe('ReviewController', () => {
     };
 
     // Act
-    controller.create(user, dto);
+    await controller.create(user, dto);
 
     // Assert
     expect(reviewService.create).toHaveBeenCalledWith('user-1', dto);
   });
 
-  it('findAll delega con el usuario autenticado', () => {
+  it('findAll delega con el usuario autenticado', async () => {
     // Act
-    controller.findAll(user);
+    await controller.findAll(user);
 
     // Assert
     expect(reviewService.findAll).toHaveBeenCalledWith('user-1');
   });
 
-  it('findOne delega con id y usuario autenticado', () => {
+  it('findOne delega con id y usuario autenticado', async () => {
     // Act
-    controller.findOne('review-1', user);
+    await controller.findOne('review-1', user);
 
     // Assert
     expect(reviewService.findOne).toHaveBeenCalledWith('review-1', 'user-1');
   });
 
-  it('update delega con id, usuario autenticado y dto', () => {
+  it('update delega con id, usuario autenticado y dto', async () => {
     // Arrange
     const dto: UpdateReviewDto = { rating: 4 };
 
     // Act
-    controller.update('review-1', user, dto);
+    await controller.update('review-1', user, dto);
 
     // Assert
     expect(reviewService.update).toHaveBeenCalledWith('review-1', 'user-1', dto);
   });
 
-  it('remove delega con id y usuario autenticado', () => {
+  it('remove delega con id y usuario autenticado', async () => {
     // Act
-    controller.remove('review-1', user);
+    await controller.remove('review-1', user);
 
     // Assert
     expect(reviewService.remove).toHaveBeenCalledWith('review-1', 'user-1');

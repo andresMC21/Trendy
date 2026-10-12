@@ -17,7 +17,7 @@ cp .env.example .env        # en Windows: copy .env.example .env
 
 # 3. Dependencias y arranque
 npm install
-npm run start               # API en http://localhost:3000/api  (Swagger en la misma ruta)
+npm run start               # API en http://localhost:3000/api (Swagger en /api/docs)
 ```
 
 Pruebas: `npm test` (unitarias) · `npm run test:cov` (cobertura) ·
@@ -34,7 +34,7 @@ Pruebas: `npm test` (unitarias) · `npm run test:cov` (cobertura) ·
 | DELETE | `/api/products/:id` | JWT (dueño, ADMIN o MODERATOR) | Borrado lógico (`REMOVED`); solo si está `AVAILABLE` |
 | POST | `/api/products/:id/favorite` | JWT | Marca / desmarca favorito |
 
-Swagger documenta todos los endpoints en `/api` (botón *Authorize* con el JWT).
+Swagger documenta los endpoints en `/api/docs` (botón *Authorize* con el JWT).
 
 **Para el módulo de transacciones** (`TransactionModule` debe importar `ProductModule`):
 

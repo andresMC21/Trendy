@@ -6,24 +6,125 @@ import { ProductStatus } from '../enums/product-status.enum';
 import { GeoPointDto } from './geo-point.dto';
 
 export class ProductDto {
-  @ApiProperty({ format: 'uuid' }) id: string;
-  @ApiProperty() sellerId: string;
-  @ApiProperty() title: string;
-  @ApiProperty() description: string;
-  @ApiProperty({ example: 250000 }) price: number;
-  @ApiProperty() acceptsBarter: boolean;
-  @ApiProperty() category: string;
-  @ApiProperty({ enum: ProductCondition }) condition: ProductCondition;
-  @ApiProperty({ enum: ProductStatus }) status: ProductStatus;
-  @ApiProperty({ type: GeoPointDto }) location: GeoPointDto;
-  @ApiProperty() neighborhoodId: string;
-  @ApiProperty({ nullable: true, type: Number }) estimatedWeightKg: number | null;
-  @ApiProperty({ example: 3 }) favoritesCount: number;
-  @ApiProperty({ example: 10 }) viewsCount: number;
-  @ApiPropertyOptional({ example: 1.37, description: 'Distancia en km (solo si se envió lat/lng)' })
+  @ApiProperty({
+    type: String,
+    format: 'uuid',
+    description: 'Identificador único del producto.',
+  })
+  id: string;
+
+  @ApiProperty({
+    type: String,
+    format: 'uuid',
+    description: 'Identificador del vendedor propietario del producto.',
+  })
+  sellerId: string;
+
+  @ApiProperty({
+    type: String,
+    example: 'Bicicleta MTB {{neighborhoodId}}',
+    description: 'Título del producto.',
+  })
+  title: string;
+
+  @ApiProperty({
+    type: String,
+    example: 'Rin 26, cambios Shimano, poco uso',
+    description: 'Descripción del producto.',
+  })
+  description: string;
+
+  @ApiProperty({
+    type: Number,
+    example: 250000,
+    description: 'Precio del producto.',
+  })
+  price: number;
+
+  @ApiProperty({
+    type: Boolean,
+    example: true,
+    description: 'Indica si se acepta trueque.',
+  })
+  acceptsBarter: boolean;
+
+  @ApiProperty({
+    type: String,
+    example: 'deportes',
+    description: 'Categoría del producto.',
+  })
+  category: string;
+
+  @ApiProperty({
+    type: String,
+    enum: ProductCondition,
+    example: ProductCondition.LIKE_NEW,
+    description: 'Condición del producto.',
+  })
+  condition: ProductCondition;
+
+  @ApiProperty({
+    type: String,
+    enum: ProductStatus,
+    example: ProductStatus.AVAILABLE,
+    description: 'Estado actual del producto.',
+  })
+  status: ProductStatus;
+
+  @ApiProperty({
+    type: GeoPointDto,
+    description: 'Ubicación geográfica del producto.',
+  })
+  location: GeoPointDto;
+
+  @ApiProperty({
+    type: String,
+    example: '{{neighborhoodId}}',
+    description: 'Identificador del barrio asociado al producto.',
+  })
+  neighborhoodId: string;
+
+  @ApiProperty({
+    type: Number,
+    nullable: true,
+    example: 14.5,
+    description: 'Peso estimado en kilogramos o null si no se especificó.',
+  })
+  estimatedWeightKg: number | null;
+
+  @ApiProperty({
+    type: Number,
+    example: 1,
+    description: 'Cantidad de usuarios que marcaron el producto como favorito.',
+  })
+  favoritesCount: number;
+
+  @ApiProperty({
+    type: Number,
+    description: 'Cantidad de visitas al producto.',
+  })
+  viewsCount: number;
+
+  @ApiPropertyOptional({
+    type: Number,
+    description:
+      'Distancia en kilómetros; solo aparece si se enviaron lat y lng.',
+  })
   distanceKm?: number;
-  @ApiProperty() createdAt: Date;
-  @ApiProperty() updatedAt: Date;
+
+  @ApiProperty({
+    type: String,
+    format: 'date-time',
+    description: 'Fecha y hora de publicación del producto.',
+  })
+  createdAt: Date;
+
+  @ApiProperty({
+    type: String,
+    format: 'date-time',
+    description: 'Fecha y hora de la última actualización del producto.',
+  })
+  updatedAt: Date;
 
   static fromEntity(
     product: Product,
@@ -52,24 +153,82 @@ export class ProductDto {
 }
 
 export class ProductSellerDto {
-  @ApiProperty() id: string;
-  @ApiProperty() fullName: string;
-  @ApiProperty({ nullable: true, type: String }) photoUrl: string | null;
-  @ApiProperty({ example: 4.8 }) ratingAverage: number;
-  @ApiProperty({ example: 12 }) reviewsCount: number;
+  @ApiProperty({
+    type: String,
+    format: 'uuid',
+    description: 'Identificador único del vendedor.',
+  })
+  id: string;
+
+  @ApiProperty({
+    type: String,
+    example: 'Vendedor Postman',
+    description: 'Nombre completo del vendedor.',
+  })
+  fullName: string;
+
+  @ApiProperty({
+    type: String,
+    nullable: true,
+    description: 'URL de la foto del vendedor o null si no está definida.',
+  })
+  photoUrl: string | null;
+
+  @ApiProperty({
+    type: Number,
+    description: 'Promedio de calificaciones recibidas por el vendedor.',
+  })
+  ratingAverage: number;
+
+  @ApiProperty({
+    type: Number,
+    description: 'Cantidad de reseñas recibidas por el vendedor.',
+  })
+  reviewsCount: number;
 }
 
 export class ProductDetailDto extends ProductDto {
-  @ApiProperty({ type: ProductSellerDto }) seller: ProductSellerDto;
+  @ApiProperty({
+    type: ProductSellerDto,
+    description: 'Perfil público del vendedor.',
+  })
+  seller: ProductSellerDto;
 }
 
 export class PaginatedProductsDto {
-  @ApiProperty({ type: [ProductDto] }) items: ProductDto[];
-  @ApiProperty({ example: 42 }) total: number;
-  @ApiProperty({ example: 1 }) page: number;
-  @ApiProperty({ example: 20 }) limit: number;
+  @ApiProperty({
+    type: [ProductDto],
+    description: 'Productos incluidos en la página actual.',
+  })
+  items: ProductDto[];
+
+  @ApiProperty({
+    type: Number,
+    example: 4,
+    description: 'Cantidad total de productos que coinciden con los filtros.',
+  })
+  total: number;
+
+  @ApiProperty({
+    type: Number,
+    example: 2,
+    description: 'Número de página devuelto.',
+  })
+  page: number;
+
+  @ApiProperty({
+    type: Number,
+    example: 2,
+    description: 'Cantidad de productos por página.',
+  })
+  limit: number;
 }
 
 export class FavoriteResultDto {
-  @ApiProperty({ example: true }) isFavorite: boolean;
+  @ApiProperty({
+    type: Boolean,
+    example: true,
+    description: 'Nuevo estado del favorito para el usuario autenticado.',
+  })
+  isFavorite: boolean;
 }

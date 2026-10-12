@@ -16,10 +16,8 @@ export function Auth(...roles: ValidRoles[]) {
     UseGuards(AuthGuard(), UserRoleGuard),
     ApiBearerAuth('JWT-auth'),
     ApiUnauthorizedResponse({ description: 'Falta el JWT o es inválido' }),
-    ApiForbiddenResponse({
-      description: roles.length
-        ? `Requiere alguno de estos roles: ${roles.join(', ')}`
-        : 'Sin permiso',
-    }),
+    ...(roles.length
+      ? [ApiForbiddenResponse({ description: `Requiere alguno de estos roles: ${roles.join(', ')}` })]
+      : []),
   );
 }

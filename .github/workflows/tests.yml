@@ -46,7 +46,7 @@ jobs:
         run: node --version
 
       - name: Instalar dependencias
-        run: npm ci
+        run: npm install --package-lock-only && npm ci
 
       - name: Habilitar extensiones de Postgres
         run: |

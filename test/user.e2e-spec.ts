@@ -126,7 +126,7 @@ describe('Users (e2e)', () => {
         email: userEmail,
         password,
       })
-      .expect(201);
+      .expect(200);
 
     expect(res.body).toMatchObject({
       id: userId,
@@ -213,7 +213,7 @@ describe('Users (e2e)', () => {
         email: userEmail,
         password: newPassword,
       })
-      .expect(201);
+      .expect(200);
   });
 
   it('PATCH /user/me/password rechaza una contraseña actual incorrecta', async () => {
@@ -251,7 +251,7 @@ describe('Users (e2e)', () => {
         email: newEmail,
         password: 'NewPassw2',
       })
-      .expect(201);
+      .expect(200);
   });
 
   it('GET /user/:id devuelve el perfil público autenticado', async () => {

@@ -6,16 +6,19 @@ export class UpdateUserDto extends PartialType(
   PickType(RegisterUserDto, ['fullName'] as const),
 ) {
   @ApiPropertyOptional({
+    type: String,
     format: 'uri',
-    example: 'https://example.com/photo.jpg',
+    example: 'https://example.com/vendedor.png',
+    description: 'URL de la foto de perfil.',
   })
   @IsOptional()
   @IsUrl()
   photoUrl?: string;
 
   @ApiPropertyOptional({
+    type: String,
     maxLength: 300,
-    example: 'Amante de los libros y la música.',
+    description: 'Información adicional del perfil, de hasta 300 caracteres.',
   })
   @IsOptional()
   @IsString()

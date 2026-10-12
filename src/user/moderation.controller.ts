@@ -9,12 +9,15 @@ import {
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiBody,
   ApiConflictResponse,
   ApiForbiddenResponse,
+  ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { Auth } from './decorators/auth.decorator';
@@ -39,11 +42,34 @@ export class ModerationController {
     description:
       'ADMIN y MODERATOR pueden consultar solicitudes PENDING. Devuelve primero las solicitudes más antiguas; limit y skip controlan la paginación.',
   })
-  @ApiOkResponse({ type: PaginatedUsersDto })
+  @ApiQuery({
+    name: 'limit',
+    type: Number,
+    required: false,
+    example: 100,
+    description:
+      'Cantidad de solicitudes por página (de 1 a 100; predeterminado: 20).',
+  })
+  @ApiQuery({
+    name: 'skip',
+    type: Number,
+    required: false,
+    example: 0,
+    description:
+      'Cantidad de solicitudes que se omiten antes de iniciar la página.',
+  })
+  @ApiOkResponse({
+    type: PaginatedUsersDto,
+    description:
+      'Se devuelve la página de solicitudes pendientes en orden de antigüedad.',
+  })
   @ApiBadRequestResponse({
     description: 'Los parámetros de paginación no son válidos',
   })
-  findPending(@Query() pagination: PaginationDto) {
+  @ApiInternalServerErrorResponse({
+    description: 'Error inesperado al listar las solicitudes pendientes.',
+  })
+  findPending(@Query() pagination: PaginationDto): Promise<PaginatedUsersDto> {
     return this.userService.findPendingVerifications(pagination);
   }
 
@@ -56,10 +82,21 @@ export class ModerationController {
   })
   @ApiParam({
     name: 'userId',
+    type: String,
     format: 'uuid',
-    description: 'Id del usuario solicitante',
+    example: '00000000-0000-4000-8000-000000000000',
+    description: 'Identificador UUID del usuario solicitante.',
   })
-  @ApiOkResponse({ type: UserProfileDto })
+  @ApiBody({
+    type: ResolveVerification,
+    description:
+      'Decisión de aprobación o rechazo y, opcionalmente, su motivo.',
+  })
+  @ApiOkResponse({
+    type: UserProfileDto,
+    description:
+      'La solicitud se resolvió y se devuelve el perfil actualizado.',
+  })
   @ApiBadRequestResponse({
     description: 'El id o el cuerpo de la solicitud es inválido',
   })
@@ -70,11 +107,14 @@ export class ModerationController {
   @ApiConflictResponse({
     description: 'El usuario no tiene una verificación pendiente',
   })
+  @ApiInternalServerErrorResponse({
+    description: 'Error inesperado al resolver la solicitud de verificación.',
+  })
   resolve(
     @GetUser() moderator: User,
     @Param('userId', ParseUUIDPipe) userId: string,
     @Body() dto: ResolveVerification,
-  ) {
+  ): Promise<UserProfileDto> {
     return this.userService.resolveVerification(moderator, userId, dto);
   }
 }

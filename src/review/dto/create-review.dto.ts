@@ -11,13 +11,17 @@ import {
 
 export class CreateReviewDto {
   @ApiProperty({
+    type: String,
     format: 'uuid',
-    description: 'Id de la transaccion completada que se va a reseñar.',
+    example: '{{transactionId}}',
+    description:
+      'Identificador UUID de la transacción completada que se va a reseñar.',
   })
   @IsUUID()
   transactionId: string;
 
   @ApiProperty({
+    type: Number,
     minimum: 1,
     maximum: 5,
     example: 5,
@@ -29,6 +33,7 @@ export class CreateReviewDto {
   rating: number;
 
   @ApiPropertyOptional({
+    type: String,
     example: 'Entrega puntual y producto en buen estado.',
     maxLength: 1000,
     nullable: true,

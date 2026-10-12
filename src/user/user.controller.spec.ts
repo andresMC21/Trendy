@@ -1,3 +1,4 @@
+import { HTTP_CODE_METADATA } from '@nestjs/common/constants';
 import { PassportModule } from '@nestjs/passport';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
@@ -30,6 +31,18 @@ describe('UserController', () => {
   it('should be defined', () => {
     // Assert
     expect(controller).toBeDefined();
+  });
+
+  it('uses 200 for POST operations that do not create a resource', () => {
+    expect(
+      Reflect.getMetadata(HTTP_CODE_METADATA, UserController.prototype.login),
+    ).toBe(200);
+    expect(
+      Reflect.getMetadata(
+        HTTP_CODE_METADATA,
+        UserController.prototype.requestVerification,
+      ),
+    ).toBe(200);
   });
 
   it('register delega al servicio', async () => {

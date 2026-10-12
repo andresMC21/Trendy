@@ -1,28 +1,62 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsLatitude, IsLongitude, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsLatitude,
+  IsLongitude,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 import { ProductCondition } from '../enums/product-condition.enum';
 import { ProductSort } from '../enums/product-sort.enum';
 
 export class FindProductsQueryDto {
-  @ApiPropertyOptional({ example: 'barrio-granada', description: 'Filtra por barrio' })
+  @ApiPropertyOptional({
+    type: String,
+    example: '{{neighborhoodId}}',
+    description: 'Filtra por el identificador del barrio.',
+  })
   @IsOptional()
   @IsString()
   neighborhood?: string;
 
-  @ApiPropertyOptional({ example: 3.4516, description: 'Latitud del usuario (requiere lng)' })
+  @ApiPropertyOptional({
+    type: Number,
+    example: 3.452,
+    minimum: -90,
+    maximum: 90,
+    description: 'Latitud del punto de búsqueda; requiere lng.',
+  })
   @IsOptional()
   @Type(() => Number)
   @IsLatitude()
   lat?: number;
 
-  @ApiPropertyOptional({ example: -76.532, description: 'Longitud del usuario (requiere lat)' })
+  @ApiPropertyOptional({
+    type: Number,
+    example: -76.531,
+    minimum: -180,
+    maximum: 180,
+    description: 'Longitud del punto de búsqueda; requiere lat.',
+  })
   @IsOptional()
   @Type(() => Number)
   @IsLongitude()
   lng?: number;
 
-  @ApiPropertyOptional({ example: 5, default: 5, description: 'Radio en km (0.1 a 50). Solo aplica con lat/lng' })
+  @ApiPropertyOptional({
+    type: Number,
+    example: 2,
+    default: 5,
+    minimum: 0.1,
+    maximum: 50,
+    description:
+      'Radio de búsqueda en kilómetros (de 0.1 a 50); aplica solo con lat y lng.',
+  })
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
@@ -30,29 +64,57 @@ export class FindProductsQueryDto {
   @Max(50)
   radius?: number;
 
-  @ApiPropertyOptional({ example: 'deportes' })
+  @ApiPropertyOptional({
+    type: String,
+    example: 'LIBROS',
+    description: 'Filtra por categoría.',
+  })
   @IsOptional()
   @IsString()
   category?: string;
 
-  @ApiPropertyOptional({ enum: ProductCondition })
+  @ApiPropertyOptional({
+    type: String,
+    enum: ProductCondition,
+    example: ProductCondition.USED,
+    description: 'Filtra por condición del producto.',
+  })
   @IsOptional()
   @IsEnum(ProductCondition)
   condition?: ProductCondition;
 
-  @ApiPropertyOptional({ enum: ProductSort, default: ProductSort.RECENT, description: 'distance requiere lat/lng' })
+  @ApiPropertyOptional({
+    type: String,
+    enum: ProductSort,
+    example: ProductSort.PRICE_ASC,
+    default: ProductSort.RECENT,
+    description: 'Criterio de orden; distance requiere lat y lng.',
+  })
   @IsOptional()
   @IsEnum(ProductSort)
   sort?: ProductSort;
 
-  @ApiPropertyOptional({ example: 1, default: 1, minimum: 1 })
+  @ApiPropertyOptional({
+    type: Number,
+    example: 2,
+    default: 1,
+    minimum: 1,
+    description: 'Número de página, empezando en 1.',
+  })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
   page?: number;
 
-  @ApiPropertyOptional({ example: 20, default: 20, minimum: 1, maximum: 50 })
+  @ApiPropertyOptional({
+    type: Number,
+    example: 2,
+    default: 20,
+    minimum: 1,
+    maximum: 50,
+    description: 'Cantidad de productos por página (de 1 a 50).',
+  })
   @IsOptional()
   @Type(() => Number)
   @IsInt()

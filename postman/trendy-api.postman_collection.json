@@ -92,7 +92,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
                   "const b = pm.response.json();",
                   "pm.test(\"Devuelve id y token JWT\", function () { pm.expect(b.token).to.be.a(\"string\"); pm.expect(b.id).to.be.a(\"string\"); });",
                   "pm.collectionVariables.set(\"tokenSeller\", b.token);",
@@ -186,7 +186,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
                   "const b = pm.response.json();",
                   "pm.test(\"Devuelve id y token JWT\", function () { pm.expect(b.token).to.be.a(\"string\"); pm.expect(b.id).to.be.a(\"string\"); });",
                   "pm.collectionVariables.set(\"tokenBuyer\", b.token);",
@@ -280,7 +280,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
                   "const b = pm.response.json();",
                   "pm.test(\"Devuelve id y token JWT\", function () { pm.expect(b.token).to.be.a(\"string\"); pm.expect(b.id).to.be.a(\"string\"); });",
                   "pm.collectionVariables.set(\"tokenMod\", b.token);",
@@ -343,7 +343,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
                   "const b = pm.response.json();",
                   "pm.test(\"Devuelve id y token JWT del admin seed\", function () { pm.expect(b.token).to.be.a(\"string\").and.not.empty; pm.expect(b.id).to.be.a(\"string\").and.not.empty; });",
                   "pm.collectionVariables.set(\"tokenSeedAdmin\", b.token);",
@@ -393,7 +393,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
                   "const b = pm.response.json();",
                   "pm.test(\"Devuelve id del admin postman\", function () { pm.expect(b.id).to.be.a(\"string\").and.not.empty; });",
                   "pm.collectionVariables.set(\"postmanAdmin\", b.id);"
@@ -529,7 +529,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
                   "const b = pm.response.json();",
                   "pm.test(\"Devuelve id y token JWT\", function () { pm.expect(b.token).to.be.a(\"string\"); pm.expect(b.id).to.be.a(\"string\"); });",
                   "pm.collectionVariables.set(\"tokenAdmin\", b.token);",
@@ -678,7 +678,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
                   "const b = pm.response.json();",
                   "pm.test(\"Devuelve id y token JWT\", function () { pm.expect(b.token).to.be.a(\"string\"); pm.expect(b.id).to.be.a(\"string\"); });",
                   "pm.collectionVariables.set(\"tokenTemp\", b.token);",
@@ -1297,7 +1297,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
                   "pm.test(\"verificationStatus = PENDING\", function () { pm.expect(pm.response.json().verificationStatus).to.eql(\"PENDING\"); });"
                 ]
               }
@@ -1694,7 +1694,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
                   "pm.collectionVariables.set(\"tokenTemp\", pm.response.json().token);"
                 ]
               }
@@ -1953,7 +1953,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
                   "pm.collectionVariables.set(\"tokenTemp\", pm.response.json().token);"
                 ]
               }
@@ -1961,7 +1961,7 @@
           ]
         },
         {
-          "name": "GET /user/:id sin token → 401",
+          "name": "GET /user/:id público sin token → 200",
           "request": {
             "method": "GET",
             "header": [],
@@ -1985,7 +1985,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Es el vendedor\", function () { pm.expect(pm.response.json().id).to.eql(pm.collectionVariables.get(\"sellerId\")); });"
                 ]
               }
             }
@@ -3487,7 +3488,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
                   "pm.collectionVariables.set(\"tokenTemp\", pm.response.json().token);"
                 ]
               }
@@ -4101,7 +4102,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
                   "pm.collectionVariables.set(\"tokenTemp2\", pm.response.json().token); pm.collectionVariables.set(\"temp2Id\", pm.response.json().id);"
                 ]
               }
@@ -4141,7 +4142,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });"
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
@@ -4234,7 +4235,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
                   "pm.test(\"PENDING otra vez\", function () { pm.expect(pm.response.json().verificationStatus).to.eql(\"PENDING\"); });"
                 ]
               }
@@ -4887,6 +4888,47 @@
           ]
         },
         {
+          "name": "GET /products: orden por precio descendente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products?neighborhood={{neighborhoodId}}&sort=price_desc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "neighborhood",
+                  "value": "{{neighborhoodId}}"
+                },
+                {
+                  "key": "sort",
+                  "value": "price_desc"
+                }
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Precios descendentes\", function () { const p = pm.response.json().items.map(i => i.price); pm.expect(p).to.eql(p.slice().sort((a,b)=>b-a)); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "GET /products: lat sin lng → 400",
           "request": {
             "method": "GET",
@@ -5023,6 +5065,48 @@
                   "const p = pm.response.json();",
                   "pm.test(\"Incluye vendedor sin datos sensibles\", function () { pm.expect(p.seller.id).to.eql(pm.collectionVariables.get(\"sellerId\")); pm.expect(p.seller).to.not.have.property(\"password\"); pm.expect(p.seller).to.not.have.property(\"email\"); });",
                   "pm.test(\"viewsCount >= 1\", function () { pm.expect(p.viewsCount).to.be.at.least(1); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /products: orden por popularidad",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products?neighborhood={{neighborhoodId}}&sort=popular",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "neighborhood",
+                  "value": "{{neighborhoodId}}"
+                },
+                {
+                  "key": "sort",
+                  "value": "popular"
+                }
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Visitas descendentes\", function () { const items = pm.response.json().items; const visits = items.map(i => i.viewsCount); pm.expect(visits).to.eql(visits.slice().sort((a,b)=>b-a)); });",
+                  "pm.test(\"El más visitado de los productos creados aparece primero\", function () { const items = pm.response.json().items; const ids = items.map(i => i.id); const productIndex = ids.indexOf(pm.collectionVariables.get(\"productId\")); const product2Index = ids.indexOf(pm.collectionVariables.get(\"productId2\")); pm.expect(productIndex).to.be.at.least(0); pm.expect(product2Index).to.be.at.least(0); pm.expect(items[productIndex].viewsCount).to.be.greaterThan(items[product2Index].viewsCount); pm.expect(productIndex).to.be.below(product2Index); });"
                 ]
               }
             }
@@ -5978,6 +6062,7 @@
                   "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
                   "const t = pm.response.json();",
                   "pm.test(\"PENDING entre comprador y vendedor\", function () { pm.expect(t.status).to.eql(\"PENDING\"); pm.expect(t.buyerId).to.eql(pm.collectionVariables.get(\"buyerId\")); pm.expect(t.sellerId).to.eql(pm.collectionVariables.get(\"sellerId\")); pm.expect(t.safePointId).to.eql(null); });",
+                  "pm.test(\"Conserva el mensaje enviado\", function () { pm.expect(t.message).to.eql(\"Me interesa, ¿sigue disponible?\"); });",
                   "pm.collectionVariables.set(\"transactionId\", t.id);"
                 ]
               }
@@ -6455,6 +6540,59 @@
           ]
         },
         {
+          "name": "PUT /transactions/:id/status: transacción inexistente → 404",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/00000000-0000-4000-8000-000000000000/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "00000000-0000-4000-8000-000000000000",
+                "status"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenBuyer}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"CANCELLED\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "PUT /transactions/:id/status: estado inválido → 400",
           "request": {
             "method": "PUT",
@@ -6662,6 +6800,59 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /transactions/:id/confirm-point: transacción inexistente → 404",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/00000000-0000-4000-8000-000000000000/confirm-point",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "00000000-0000-4000-8000-000000000000",
+                "confirm-point"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenBuyer}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"safePointId\": \"sp-1\",\n  \"scheduledTime\": \"2030-10-05T15:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", function () { pm.response.to.have.status(404); });"
                 ]
               }
             }
@@ -7414,6 +7605,267 @@
           ]
         },
         {
+          "name": "POST /review: transacción inexistente → 404",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/review",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "review"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenBuyer}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transactionId\": \"00000000-0000-4000-8000-000000000000\",\n  \"rating\": 5,\n  \"comment\": \"Transacción inexistente\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /transactions: preparar transacción PENDING para prueba de reseña",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/transactions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenBuyer}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"{{productId2}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "const t = pm.response.json();",
+                  "pm.test(\"Transacción PENDING creada\", function () { pm.expect(t.status).to.eql(\"PENDING\"); });",
+                  "pm.collectionVariables.set(\"reviewPendingTransactionId\", t.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /review: transacción no completada → 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/review",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "review"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenBuyer}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transactionId\": \"{{reviewPendingTransactionId}}\",\n  \"rating\": 5,\n  \"comment\": \"La transacción sigue pendiente\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT /transactions/:id/status: cancelar transacción PENDING de prueba",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/transactions/{{reviewPendingTransactionId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "transactions",
+                "{{reviewPendingTransactionId}}",
+                "status"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenBuyer}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"CANCELLED\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Transacción de prueba cancelada\", function () { pm.expect(pm.response.json().status).to.eql(\"CANCELLED\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /review: usuario ajeno a la transacción → 403",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/review",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "review"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenTemp}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transactionId\": \"{{transactionId}}\",\n  \"rating\": 5,\n  \"comment\": \"Usuario no participante\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "GET /review: listar resenas del usuario autenticado",
           "request": {
             "method": "GET",
@@ -7542,6 +7994,111 @@
                   "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
                   "const r = pm.response.json();",
                   "pm.test(\"Actualiza rating y comentario\", function () { pm.expect(r.id).to.eql(pm.collectionVariables.get(\"reviewId\")); pm.expect(r.rating).to.eql(4); pm.expect(r.comment).to.eql(\"Producto correcto y entrega a tiempo.\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /review/:id: rating inválido → 400",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/review/{{reviewId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "review",
+                "{{reviewId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenBuyer}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 6\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Devuelve errores de validación\", function () { pm.expect(pm.response.json().message).to.be.an(\"array\").that.is.not.empty; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /review/:id: reseña inexistente → 404",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/review/00000000-0000-4000-8000-000000000000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "review",
+                "00000000-0000-4000-8000-000000000000"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenBuyer}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 4\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", function () { pm.response.to.have.status(404); });"
                 ]
               }
             }
@@ -7727,6 +8284,82 @@
                 "exec": [
                   "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });",
                   "pm.test(\"Devuelve errores de validacion\", function () { pm.expect(pm.response.json().message).to.be.an(\"array\").that.is.not.empty; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /review/:id: id inválido → 400",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/review/no-es-uuid",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "review",
+                "no-es-uuid"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenBuyer}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE /review/:id: usuario que recibió la reseña → 403",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/review/{{reviewId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "review",
+                "{{reviewId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenSeller}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
                 ]
               }
             }
@@ -8302,6 +8935,35 @@
     {
       "key": "reviewId",
       "value": ""
+    }
+  ],
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "id": "api-error-contract",
+        "type": "text/javascript",
+        "exec": [
+          "if (pm.response.code >= 400) {",
+          "  let errorBody;",
+          "  pm.test(\"Error devuelve un cuerpo JSON\", function () {",
+          "    pm.expect(pm.response.headers.get(\"Content-Type\") || \"\").to.include(\"application/json\");",
+          "    errorBody = pm.response.json();",
+          "    pm.expect(errorBody).to.be.an(\"object\").and.not.an(\"array\");",
+          "  });",
+          "  if (errorBody) {",
+          "    pm.test(\"statusCode coincide con el estado HTTP\", function () {",
+          "      pm.expect(errorBody.statusCode).to.eql(pm.response.code);",
+          "    });",
+          "    pm.test(\"error es la etiqueta HTTP correspondiente\", function () {",
+          "      const labels = { 400: \"Bad Request\", 401: \"Unauthorized\", 403: \"Forbidden\", 404: \"Not Found\", 409: \"Conflict\", 500: \"Internal Server Error\" };",
+          "      pm.expect(errorBody.error).to.be.a(\"string\").and.not.empty;",
+          "      if (labels[pm.response.code]) pm.expect(errorBody.error).to.eql(labels[pm.response.code]);",
+          "    });",
+          "  }",
+          "}"
+        ]
+      }
     }
   ]
 }

@@ -43,7 +43,7 @@ export class TransactionService {
     @InjectRepository(Transaction)
     private readonly transactionRepository: Repository<Transaction>,
     private readonly productService: ProductService,
-  ) {}
+  ) { }
 
   async create(
     buyerId: string,
@@ -81,6 +81,7 @@ export class TransactionService {
       buyerId,
       sellerId: product.sellerId,
       status: TransactionStatus.PENDING,
+      message: createTransactionDto.message ?? null
     });
 
     await this.productService.updateStatus(product.id, ProductStatus.RESERVED);

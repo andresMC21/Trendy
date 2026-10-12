@@ -1,30 +1,26 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class ApiErrorResponseDto {
-  @ApiProperty({ example: 400, description: 'Código HTTP de la respuesta.' })
+  @ApiProperty({
+    type: Number,
+    example: 400,
+    required: true,
+    description: 'Código HTTP de la respuesta.',
+  })
   statusCode: number;
 
   @ApiProperty({
-    oneOf: [
-      { type: 'string', example: 'El cuerpo de la solicitud no es válido.' },
-      {
-        type: 'array',
-        items: { type: 'string' },
-        example: [
-          'email must be an email',
-          'password must be longer than 7 characters',
-        ],
-      },
-    ],
+    required: true,
+    oneOf: [{ type: 'string' }, { type: 'array', items: { type: 'string' } }],
     description:
-      'Mensaje de error. La validación de DTO puede devolver una lista de mensajes; las demás excepciones devuelven normalmente una cadena.',
+      'Mensaje del error. La validación de DTO devuelve una lista de mensajes; otras excepciones suelen devolver una cadena.',
   })
   message: string | string[];
 
-  @ApiPropertyOptional({
-    example: 'Bad Request',
-    description:
-      'Etiqueta HTTP incluida por NestJS en la mayoría de las excepciones. Puede faltar en algunos errores internos.',
+  @ApiProperty({
+    type: String,
+    required: true,
+    description: 'Etiqueta HTTP de la excepción.',
   })
-  error?: string;
+  error: string;
 }

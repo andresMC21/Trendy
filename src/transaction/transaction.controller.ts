@@ -35,17 +35,34 @@ export class TransactionController {
 
   @Post()
   @Auth()
-  @ApiOperation({ summary: 'Iniciar una intencion de compra o trueque' })
+  @ApiOperation({
+    summary: 'Iniciar una intención de compra o trueque',
+    description:
+      'Requiere JWT. El usuario autenticado queda como comprador; el vendedor se obtiene del producto. La transacción inicia en PENDING y el producto queda reservado.',
+  })
   @ApiCreatedResponse({ type: TransactionDto })
+  @ApiBadRequestResponse({
+    description: 'El cuerpo no es válido o productId no tiene formato UUID',
+  })
+  @ApiNotFoundResponse({ description: 'Producto no encontrado' })
   @ApiConflictResponse({ description: 'Producto no disponible o ya reservado' })
-  @ApiForbiddenResponse({ description: 'El usuario intenta comprar su propio producto' })
-  create(@GetUser() user: User, @Body() createTransactionDto: CreateTransactionDto) {
+  @ApiForbiddenResponse({
+    description: 'El usuario intenta comprar su propio producto',
+  })
+  create(
+    @GetUser() user: User,
+    @Body() createTransactionDto: CreateTransactionDto,
+  ) {
     return this.transactionService.create(user.id, createTransactionDto);
   }
 
   @Get()
   @Auth()
-  @ApiOperation({ summary: 'Listar transacciones del usuario autenticado' })
+  @ApiOperation({
+    summary: 'Listar las transacciones del usuario autenticado',
+    description:
+      'Requiere JWT. Incluye las transacciones en las que participa como comprador o vendedor, ordenadas por última actualización.',
+  })
   @ApiOkResponse({ type: [TransactionDto] })
   findAll(@GetUser() user: User) {
     return this.transactionService.findAll(user.id);
@@ -53,11 +70,18 @@ export class TransactionController {
 
   @Get(':id')
   @Auth()
-  @ApiOperation({ summary: 'Detalle de una transaccion' })
-  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiOperation({
+    summary: 'Consultar una transacción',
+    description:
+      'Solo pueden consultarla el comprador y el vendedor participantes.',
+  })
+  @ApiParam({ name: 'id', format: 'uuid', description: 'Id de la transacción' })
   @ApiOkResponse({ type: TransactionDto })
-  @ApiNotFoundResponse({ description: 'Transaccion no encontrada' })
-  @ApiForbiddenResponse({ description: 'El usuario no participa en la transaccion' })
+  @ApiBadRequestResponse({ description: 'El id no tiene formato UUID' })
+  @ApiNotFoundResponse({ description: 'Transacción no encontrada' })
+  @ApiForbiddenResponse({
+    description: 'El usuario no participa en la transacción',
+  })
   findOne(@Param('id', ParseUUIDPipe) id: string, @GetUser() user: User) {
     return this.transactionService.findOne(id, user.id);
   }
@@ -69,10 +93,17 @@ export class TransactionController {
     description:
       'Transiciones válidas: PENDING -> AGREED_POINT/CANCELLED y AGREED_POINT -> COMPLETED/CANCELLED. Para pasar a AGREED_POINT deben existir un punto seguro y un horario confirmados.',
   })
-  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiParam({ name: 'id', format: 'uuid', description: 'Id de la transacción' })
   @ApiOkResponse({ type: TransactionDto })
-  @ApiBadRequestResponse({ description: 'Falta confirmar punto para AGREED_POINT' })
-  @ApiConflictResponse({ description: 'Transicion de estado invalida' })
+  @ApiBadRequestResponse({
+    description:
+      'El id o el estado no son válidos, o falta confirmar punto para AGREED_POINT',
+  })
+  @ApiNotFoundResponse({ description: 'Transacción no encontrada' })
+  @ApiForbiddenResponse({
+    description: 'El usuario no participa en la transacción',
+  })
+  @ApiConflictResponse({ description: 'Transición de estado inválida' })
   updateStatus(
     @Param('id', ParseUUIDPipe) id: string,
     @GetUser() user: User,
@@ -84,10 +115,21 @@ export class TransactionController {
   @Post(':id/confirm-point')
   @Auth()
   @HttpCode(200)
-  @ApiOperation({ summary: 'Confirmar punto seguro y horario de encuentro' })
-  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiOperation({
+    summary: 'Confirmar punto seguro y horario de encuentro',
+    description:
+      'Cualquier participante puede registrar el punto y el horario mientras la transacción esté PENDING. La operación cambia el estado a AGREED_POINT.',
+  })
+  @ApiParam({ name: 'id', format: 'uuid', description: 'Id de la transacción' })
   @ApiOkResponse({ type: TransactionDto })
-  @ApiConflictResponse({ description: 'La transaccion no esta PENDING' })
+  @ApiBadRequestResponse({
+    description: 'El id, el punto o la fecha programada no son válidos',
+  })
+  @ApiNotFoundResponse({ description: 'Transacción no encontrada' })
+  @ApiForbiddenResponse({
+    description: 'El usuario no participa en la transacción',
+  })
+  @ApiConflictResponse({ description: 'La transacción no está PENDING' })
   confirmPoint(
     @Param('id', ParseUUIDPipe) id: string,
     @GetUser() user: User,

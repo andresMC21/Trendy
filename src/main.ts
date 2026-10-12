@@ -3,6 +3,8 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { ApiErrorResponseDto } from './common/dto/api-error-response.dto';
+import { documentApiErrors } from './common/swagger/document-api-errors';
 
 // Capture errors that happen before NestJS initializes its logger.
 process.on('uncaughtException', (err) => {
@@ -38,7 +40,9 @@ async function bootstrap() {
     // Swagger documentation
     const swaggerConfig = new DocumentBuilder()
       .setTitle('Trendy API')
-      .setDescription('Marketplace hiperlocal de segunda mano')
+      .setDescription(
+        'API del marketplace hiperlocal de segunda mano Trendy. Los endpoints protegidos requieren el JWT obtenido al iniciar sesión; los permisos específicos se indican en cada operación. Los errores usan un cuerpo común con statusCode, message y, normalmente, error. En los errores de validación, message es una lista de mensajes; consulta ApiErrorResponseDto para el esquema y los ejemplos.',
+      )
       .setVersion('1.0')
       .addBearerAuth(
         {
@@ -51,7 +55,13 @@ async function bootstrap() {
       )
       .build();
 
-    SwaggerModule.setup('/api/docs', app, SwaggerModule.createDocument(app, swaggerConfig));
+    const document = documentApiErrors(
+      SwaggerModule.createDocument(app, swaggerConfig, {
+        extraModels: [ApiErrorResponseDto],
+      }),
+    );
+
+    SwaggerModule.setup('/api/docs', app, document);
 
     const port = Number(process.env.PORT) || 3000;
 

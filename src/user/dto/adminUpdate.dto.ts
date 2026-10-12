@@ -1,3 +1,4 @@
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsEmail, IsOptional } from 'class-validator';
 import { UpdateUserDto } from './update.dto';
@@ -8,6 +9,7 @@ import { UpdateUserDto } from './update.dto';
  * endpoints propios; password, ratingAverage y reviewsCount nunca se editan.
  */
 export class AdminUpdateUserDto extends UpdateUserDto {
+  @ApiPropertyOptional({ format: 'email', example: 'nuevo@example.com' })
   @IsOptional()
   @Transform(({ value }: { value: unknown }) =>
     typeof value === 'string' ? value.toLowerCase().trim() : value,

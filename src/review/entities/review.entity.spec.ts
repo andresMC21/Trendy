@@ -8,21 +8,29 @@ describe('Review entity', () => {
       (entry) => entry.target === Review,
     );
 
-    // Act / Assert
-    expect(table).toBeDefined();
+    // Act
+    const isRegistered = table !== undefined;
+
+    // Assert
+    expect(isRegistered).toBe(true);
   });
 
-  it('define columnas de transaccion, calificacion, comentario y fecha', () => {
+  it('define columnas de transaccion, usuarios, calificacion, comentario y fecha', () => {
     // Arrange
-    const columnNames = getMetadataArgsStorage()
-      .columns.filter((column) => column.target === Review)
-      .map((column) => column.propertyName);
+    const columns = getMetadataArgsStorage().columns.filter(
+      (column) => column.target === Review,
+    );
 
-    // Act / Assert
+    // Act
+    const columnNames = columns.map((column) => column.propertyName);
+
+    // Assert
     expect(columnNames).toEqual(
       expect.arrayContaining([
         'id',
         'transactionId',
+        'reviewerId',
+        'targetUserId',
         'rating',
         'comment',
         'createdAt',
@@ -32,12 +40,19 @@ describe('Review entity', () => {
 
   it('mantiene unicidad por transaccion y reviewer', () => {
     // Arrange
-    const unique = getMetadataArgsStorage().uniques.find(
+    const uniques = getMetadataArgsStorage().uniques.filter(
       (entry) => entry.target === Review,
     );
 
-    // Act / Assert
-    expect(unique?.columns).toEqual(['transactionId', 'reviewer']);
+    // Act
+    const unique = uniques.find((entry) =>
+      Array.isArray(entry.columns)
+        ? entry.columns.includes('transactionId')
+        : false,
+    );
+
+    // Assert
+    expect(unique?.columns).toEqual(['transactionId', 'reviewerId']);
   });
 
   it('define relaciones con reviewer y targetUser con borrado en cascada', () => {
@@ -46,12 +61,16 @@ describe('Review entity', () => {
       (entry) => entry.target === Review,
     );
 
-    // Act / Assert
-    expect(relations.map((relation) => relation.propertyName)).toEqual(
+    // Act
+    const relationNames = relations.map((relation) => relation.propertyName);
+    const allCascadeOnDelete = relations.every(
+      (relation) => relation.options.onDelete === 'CASCADE',
+    );
+
+    // Assert
+    expect(relationNames).toEqual(
       expect.arrayContaining(['reviewer', 'targetUser']),
     );
-    expect(
-      relations.every((relation) => relation.options.onDelete === 'CASCADE'),
-    ).toBe(true);
+    expect(allCascadeOnDelete).toBe(true);
   });
 });

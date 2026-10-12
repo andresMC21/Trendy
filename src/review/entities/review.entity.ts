@@ -1,27 +1,43 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
-import { User } from "../../user/entities/user.entity";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Unique,
+} from 'typeorm';
+import { User } from '../../user/entities/user.entity';
 
 @Entity()
-@Unique(['transactionId', 'reviewer'])   // una reseña por participante y transacción
+@Unique(['transactionId', 'reviewerId'])
 export class Review {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column('uuid')
-    transactionId: string;
+  @Column('uuid')
+  transactionId: string;
 
-    @ManyToOne(() => User, { onDelete: 'CASCADE' })
-    reviewer: User;
+  @Column('uuid')
+  reviewerId: string;
 
-    @ManyToOne(() => User, { onDelete: 'CASCADE' })
-    targetUser: User;
+  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'reviewerId' })
+  reviewer: User;
 
-    @Column('int')
-    rating: number;                                  // 1 a 5
+  @Column('uuid')
+  targetUserId: string;
 
-    @Column({ type: 'text', nullable: true })
-    comment: string | null;
+  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'targetUserId' })
+  targetUser: User;
 
-    @CreateDateColumn()
-    createdAt: Date;
+  @Column('int')
+  rating: number;
+
+  @Column({ type: 'text', nullable: true })
+  comment: string | null;
+
+  @CreateDateColumn()
+  createdAt: Date;
 }

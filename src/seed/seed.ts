@@ -69,10 +69,26 @@ async function seed(): Promise<void> {
         await reviewRepository.save(
           reviewRepository.create({
             ...review,
+            reviewerId,
+            targetUserId,
             reviewer: { id: reviewerId } as User,
             targetUser: { id: targetUserId } as User,
           }),
         );
+      }
+
+      for (const seedUser of seedUsers) {
+        const result = await reviewRepository
+          .createQueryBuilder('review')
+          .select('AVG(review.rating)', 'average')
+          .addSelect('COUNT(*)', 'count')
+          .where('review.targetUserId = :userId', { userId: seedUser.id })
+          .getRawOne<{ average: string | null; count: string }>();
+
+        await userRepository.update(seedUser.id, {
+          ratingAverage: result?.average ? Number(result.average) : 0,
+          reviewsCount: result?.count ? Number(result.count) : 0,
+        });
       }
     });
   } finally {

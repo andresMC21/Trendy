@@ -7355,10 +7355,289 @@
       ]
     },
     {
-      "name": "6. Reseñas (/review) - pendiente de implementar",
+      "name": "6. Resenas (/review)",
       "item": [
         {
-          "name": "POST /review (placeholder)",
+          "name": "POST /review: crear resena comprador -> vendedor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/review",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "review"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenBuyer}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transactionId\": \"{{transactionId}}\",\n  \"rating\": 5,\n  \"comment\": \"Entrega puntual y producto en buen estado.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Crea una resena sobre una transaccion COMPLETED. Debe ejecutarse despues de completar {{transactionId}} en la carpeta de transacciones."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Devuelve la resena creada\", function () { pm.expect(r.id).to.be.a(\"string\").and.not.empty; pm.expect(r.transactionId).to.eql(pm.collectionVariables.get(\"transactionId\")); pm.expect(r.rating).to.eql(5); pm.expect(r.comment).to.eql(\"Entrega puntual y producto en buen estado.\"); });",
+                  "pm.test(\"Reviewer es comprador y target es vendedor\", function () { pm.expect(r.reviewer.id).to.eql(pm.collectionVariables.get(\"buyerId\")); pm.expect(r.targetUser.id).to.eql(pm.collectionVariables.get(\"sellerId\")); });",
+                  "pm.collectionVariables.set(\"reviewId\", r.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /review: listar resenas del usuario autenticado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/review",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "review"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenBuyer}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Lista resenas hechas o recibidas por el usuario autenticado."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const reviews = pm.response.json();",
+                  "pm.test(\"Devuelve un arreglo con la resena creada\", function () { pm.expect(reviews).to.be.an(\"array\"); pm.expect(reviews.map((r) => r.id)).to.include(pm.collectionVariables.get(\"reviewId\")); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /review/:id: detalle de resena",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/review/{{reviewId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "review",
+                "{{reviewId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenBuyer}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Devuelve el detalle solicitado\", function () { pm.expect(r.id).to.eql(pm.collectionVariables.get(\"reviewId\")); pm.expect(r.transactionId).to.eql(pm.collectionVariables.get(\"transactionId\")); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH /review/:id: actualizar resena propia",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/review/{{reviewId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "review",
+                "{{reviewId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenBuyer}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 4,\n  \"comment\": \"Producto correcto y entrega a tiempo.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Actualiza rating y comentario\", function () { pm.expect(r.id).to.eql(pm.collectionVariables.get(\"reviewId\")); pm.expect(r.rating).to.eql(4); pm.expect(r.comment).to.eql(\"Producto correcto y entrega a tiempo.\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /review: resena duplicada -> 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/review",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "review"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenBuyer}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transactionId\": \"{{transactionId}}\",\n  \"rating\": 5,\n  \"comment\": \"Intento duplicado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 409\", function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /review/:id: usuario ajeno -> 403",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/review/{{reviewId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "review",
+                "{{reviewId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenTemp}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /review: sin token -> 401",
           "request": {
             "method": "POST",
             "header": [
@@ -7381,14 +7660,13 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{}",
+              "raw": "{\n  \"transactionId\": \"{{transactionId}}\",\n  \"rating\": 5\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
-            },
-            "description": "Módulo de reseñas aún sin implementar (el servicio devuelve texto de ejemplo y no tiene auth ni validaciones). Estas pruebas solo verifican que las rutas respondan; actualízalas cuando se implemente."
+            }
           },
           "event": [
             {
@@ -7396,17 +7674,22 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 2xx (módulo pendiente de implementar)\", function () { pm.expect(pm.response.code).to.be.within(200, 299); });"
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
                 ]
               }
             }
           ]
         },
         {
-          "name": "GET /review (placeholder)",
+          "name": "POST /review: body invalido -> 400",
           "request": {
-            "method": "GET",
-            "header": [],
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/review",
               "host": [
@@ -7417,87 +7700,24 @@
               ]
             },
             "auth": {
-              "type": "noauth"
-            },
-            "description": "Módulo de reseñas aún sin implementar (el servicio devuelve texto de ejemplo y no tiene auth ni validaciones). Estas pruebas solo verifican que las rutas respondan; actualízalas cuando se implemente."
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 2xx (módulo pendiente de implementar)\", function () { pm.expect(pm.response.code).to.be.within(200, 299); });"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "GET /review/:id (placeholder)",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/review/1",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "review",
-                "1"
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenBuyer}}",
+                  "type": "string"
+                }
               ]
-            },
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "Módulo de reseñas aún sin implementar (el servicio devuelve texto de ejemplo y no tiene auth ni validaciones). Estas pruebas solo verifican que las rutas respondan; actualízalas cuando se implemente."
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Responde 2xx (módulo pendiente de implementar)\", function () { pm.expect(pm.response.code).to.be.within(200, 299); });"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "PATCH /review/:id (placeholder)",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/review/1",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "review",
-                "1"
-              ]
-            },
-            "auth": {
-              "type": "noauth"
             },
             "body": {
               "mode": "raw",
-              "raw": "{}",
+              "raw": "{\n  \"transactionId\": \"no-es-uuid\",\n  \"rating\": 6,\n  \"comment\": 123\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
-            },
-            "description": "Módulo de reseñas aún sin implementar (el servicio devuelve texto de ejemplo y no tiene auth ni validaciones). Estas pruebas solo verifican que las rutas respondan; actualízalas cuando se implemente."
+            }
           },
           "event": [
             {
@@ -7505,31 +7725,38 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 2xx (módulo pendiente de implementar)\", function () { pm.expect(pm.response.code).to.be.within(200, 299); });"
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"Devuelve errores de validacion\", function () { pm.expect(pm.response.json().message).to.be.an(\"array\").that.is.not.empty; });"
                 ]
               }
             }
           ]
         },
         {
-          "name": "DELETE /review/:id (placeholder)",
+          "name": "DELETE /review/:id: eliminar resena propia",
           "request": {
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/review/1",
+              "raw": "{{baseUrl}}/review/{{reviewId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "review",
-                "1"
+                "{{reviewId}}"
               ]
             },
             "auth": {
-              "type": "noauth"
-            },
-            "description": "Módulo de reseñas aún sin implementar (el servicio devuelve texto de ejemplo y no tiene auth ni validaciones). Estas pruebas solo verifican que las rutas respondan; actualízalas cuando se implemente."
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenBuyer}}",
+                  "type": "string"
+                }
+              ]
+            }
           },
           "event": [
             {
@@ -7537,7 +7764,45 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Responde 2xx (módulo pendiente de implementar)\", function () { pm.expect(pm.response.code).to.be.within(200, 299); });"
+                  "pm.test(\"Status 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET /review/:id: resena eliminada -> 404",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/review/{{reviewId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "review",
+                "{{reviewId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenBuyer}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", function () { pm.response.to.have.status(404); });"
                 ]
               }
             }
@@ -8032,6 +8297,10 @@
     },
     {
       "key": "postmanAdmin",
+      "value": ""
+    },
+    {
+      "key": "reviewId",
       "value": ""
     }
   ]

@@ -1,0 +1,66 @@
+name: tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: trendy_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d trendy_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/trendy_test
+      DB_SSL: 'false'
+      JWT_SECRET: test-secret
+      NODE_ENV: test
+      FEED_CACHE_TTL_SECONDS: '0'
+
+    steps:
+      - name: Descargar el codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Habilitar extensiones de Postgres
+        run: |
+          psql "$DATABASE_URL" -c 'CREATE EXTENSION IF NOT EXISTS postgis;'
+          psql "$DATABASE_URL" -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
+
+      - name: Ejecutar migraciones
+        run: npm run migration:run
+
+      - name: Ejecutar lint
+        run: npm run lint
+
+      - name: Ejecutar pruebas unitarias con cobertura
+        run: npm run test:cov -- --runInBand
+
+      - name: Ejecutar pruebas de integracion e2e
+        run: npm run test:e2e -- --runInBand
+
+      - name: Compilar el proyecto
+        run: npm run build

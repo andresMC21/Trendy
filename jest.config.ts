@@ -14,7 +14,6 @@ const config: Config = {
   moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: '.',
   testRegex: '.*\\.spec\\.ts$',
-  testPathIgnorePatterns: ['/node_modules/', '/test/playwright/'],
   transform: {
     '^.+\\.(t|j)s$': 'ts-jest',
   },
@@ -28,6 +27,14 @@ const config: Config = {
     'libs/**/*.(t|j)s',
     'apps/**/*.(t|j)s',
   ],
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
+    },
+  },
   coverageDirectory: './coverage',
   testEnvironment: 'node',
 };

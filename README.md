@@ -42,52 +42,11 @@ NestJS 12 · TypeScript · TypeORM · PostgreSQL 16 + PostGIS · Passport JWT ·
 - **Docker** (para levantar PostgreSQL con PostGIS) o un PostgreSQL con la extensión PostGIS instalada
 - npm
 
-## Instalación y ejecución local
 
-```bash
-# 1. Clonar e instalar dependencias
-git clone https://github.com/andresMC21/Trendy.git
-cd Trendy
-npm i
-
-# 2. Levantar PostgreSQL + PostGIS (usuario/clave/BD: trendy)
-docker compose up -d
-
-# 3. Crear el archivo .env (ver la sección "Variables de entorno")
-
-# 4. Crear las tablas con las migraciones
-npm run migration:run
-
-# 5. Cargar los datos iniciales (incluye el usuario admin)
-npm run seed
-
-# 6. Iniciar la API
-npm run start
-```
 
 La API queda en **http://localhost:3000/api** y Swagger en **http://localhost:3000/api/docs**.
 
-### Variables de entorno
 
-Crea un archivo `.env` en la raíz (no se sube al repositorio):
-
-```env
-PORT=3000
-DATABASE_URL=postgresql://trendy:trendy@localhost:5432/trendy
-DB_SSL=false
-JWT_SECRET=cambia_este_secreto
-FEED_CACHE_TTL_SECONDS=30
-```
-
-| Variable | Obligatoria | Descripción |
-|---|---|---|
-| `DATABASE_URL` | Sí | Cadena de conexión a PostgreSQL |
-| `JWT_SECRET` | Sí | Secreto con el que se firman los JWT |
-| `PORT` | No | Puerto HTTP (por defecto `3000`) |
-| `DB_SSL` | No | `true` para conexiones con SSL (en producción es `true` por defecto) |
-| `DB_SYNCHRONIZE` / `TYPEORM_SYNCHRONIZE` | No | `true` sincroniza el esquema automáticamente. **Por defecto `false`: el esquema se crea con migraciones** |
-| `FEED_CACHE_TTL_SECONDS` | No | Segundos de caché del feed de productos (por defecto `30`; `0` la desactiva) |
-| `NODE_ENV` | No | `production` en Render |
 
 ### Scripts (`npm run`)
 

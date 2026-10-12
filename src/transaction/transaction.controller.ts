@@ -65,8 +65,9 @@ export class TransactionController {
   @Put(':id/status')
   @Auth()
   @ApiOperation({
-    summary: 'Actualizar estado de la transaccion',
-    description: 'Transiciones validas: PENDING -> CANCELLED, AGREED_POINT -> COMPLETED/CANCELLED.',
+    summary: 'Actualizar estado de la transacción',
+    description:
+      'Transiciones válidas: PENDING -> AGREED_POINT/CANCELLED y AGREED_POINT -> COMPLETED/CANCELLED. Para pasar a AGREED_POINT deben existir un punto seguro y un horario confirmados.',
   })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiOkResponse({ type: TransactionDto })

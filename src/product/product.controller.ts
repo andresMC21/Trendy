@@ -15,6 +15,7 @@ import {
   ApiBadRequestResponse,
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiForbiddenResponse,
   ApiNoContentResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -49,7 +50,7 @@ export class ProductController {
   @ApiOperation({
     summary: 'Feed de productos',
     description:
-      'Público. Solo productos AVAILABLE. Filtra por barrio, cercanía (lat/lng/radius en km), categoría y condición.',
+      'Público, no requiere JWT. Devuelve únicamente productos AVAILABLE. lat y lng deben enviarse juntos; radius se interpreta en kilómetros y solo aplica con ambos. sort=distance también requiere coordenadas.',
   })
   @ApiOkResponse({ type: PaginatedProductsDto })
   @ApiBadRequestResponse({
@@ -66,6 +67,7 @@ export class ProductController {
   })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiOkResponse({ type: ProductDetailDto })
+  @ApiBadRequestResponse({ description: 'El id no tiene formato UUID' })
   @ApiNotFoundResponse({ description: 'No existe o fue eliminado' })
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.productService.findOne(id);
@@ -73,7 +75,11 @@ export class ProductController {
 
   @Post()
   @Auth()
-  @ApiOperation({ summary: 'Publicar un producto' })
+  @ApiOperation({
+    summary: 'Publicar un producto',
+    description:
+      'Requiere JWT. El vendedor se toma del usuario autenticado; el producto inicia en estado AVAILABLE. Si no se especifican price y acceptsBarter, se usan 0 y false.',
+  })
   @ApiCreatedResponse({ type: ProductDto })
   @ApiBadRequestResponse({ description: 'Body inválido' })
   create(@GetUser() user: User, @Body() dto: CreateProductDto) {
@@ -84,11 +90,16 @@ export class ProductController {
   @Auth()
   @ApiOperation({
     summary: 'Editar un producto',
-    description: 'Solo el vendedor y solo mientras esté AVAILABLE.',
+    description:
+      'Requiere JWT. Solo el vendedor puede editar el producto y únicamente mientras esté AVAILABLE.',
   })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiOkResponse({ type: ProductDto })
+  @ApiBadRequestResponse({ description: 'El id o el cuerpo no es válido' })
   @ApiNotFoundResponse({ description: 'Producto no encontrado' })
+  @ApiForbiddenResponse({
+    description: 'Solo el vendedor puede modificar el producto',
+  })
   @ApiConflictResponse({
     description: 'El producto no está AVAILABLE',
   })
@@ -105,18 +116,20 @@ export class ProductController {
   @HttpCode(204)
   @ApiOperation({
     summary: 'Eliminar un producto (borrado lógico)',
-    description: 'El vendedor, o un ADMIN/MODERATOR. Solo si está AVAILABLE.',
+    description:
+      'Requiere JWT. El vendedor o un ADMIN/MODERATOR pueden eliminarlo solo mientras esté AVAILABLE. Se conserva el registro y se cambia el estado a REMOVED.',
   })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiNoContentResponse({ description: 'Eliminado' })
+  @ApiBadRequestResponse({ description: 'El id no tiene formato UUID' })
+  @ApiForbiddenResponse({
+    description: 'Solo el vendedor o un ADMIN/MODERATOR pueden eliminarlo',
+  })
   @ApiNotFoundResponse({ description: 'Producto no encontrado' })
   @ApiConflictResponse({
     description: 'El producto está reservado o vendido',
   })
-  remove(
-    @Param('id', ParseUUIDPipe) id: string,
-    @GetUser() user: User,
-  ) {
+  remove(@Param('id', ParseUUIDPipe) id: string, @GetUser() user: User) {
     return this.productService.remove(id, user.id, user.role);
   }
 
@@ -125,10 +138,12 @@ export class ProductController {
   @HttpCode(200)
   @ApiOperation({
     summary: 'Marcar / desmarcar favorito',
-    description: 'Alterna el estado.',
+    description:
+      'Requiere JWT. Alterna el favorito para el usuario autenticado y devuelve el nuevo estado.',
   })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ApiOkResponse({ type: FavoriteResultDto })
+  @ApiBadRequestResponse({ description: 'El id no tiene formato UUID' })
   @ApiNotFoundResponse({ description: 'Producto no encontrado' })
   toggleFavorite(
     @Param('id', ParseUUIDPipe) id: string,

@@ -17,15 +17,26 @@ export class CreateReviewDto {
   @IsUUID()
   transactionId: string;
 
-  @ApiProperty({ minimum: 1, maximum: 5, example: 5 })
+  @ApiProperty({
+    minimum: 1,
+    maximum: 5,
+    example: 5,
+    description: 'Calificación entera entre 1 y 5.',
+  })
   @IsInt()
   @Min(1)
   @Max(5)
   rating: number;
 
-  @ApiPropertyOptional({ example: 'Entrega puntual y producto en buen estado.' })
+  @ApiPropertyOptional({
+    example: 'Entrega puntual y producto en buen estado.',
+    maxLength: 1000,
+    nullable: true,
+    description:
+      'Comentario opcional; en una actualización, null permite borrar el comentario existente.',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(1000)
-  comment?: string;
+  comment?: string | null;
 }

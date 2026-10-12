@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Trendy API - Todos los endpoints",
-    "description": "Pruebas de TODOS los endpoints de Trendy (user, admin/users, moderation, products, transactions, review, health).\n\nREQUISITOS\n1) API corriendo: npm run start   (baseUrl por defecto: http://localhost:3000/api)\n2) Un usuario ADMIN. Como aún no hay seed, ejecuta UNA sola vez en la base de datos, DESPUÉS de correr la carpeta \"0. Preparación\" por primera vez (registra al admin):\n\n   UPDATE \"user\" SET role = '{ADMIN}' WHERE email = 'admin.postman@trendy.test';\n\n   y vuelve a ejecutar la colección completa.\n3) Ejecuta la colección COMPLETA y en orden (Collection Runner → Run). Las carpetas dependen una de otra: los tokens, ids y el barrio de prueba se guardan solos en variables de la colección. La primera request regenera los datos temporales en cada ejecución, así que se puede repetir cuantas veces quieras.\n\nPor consola: npx newman run postman/trendy-api.postman_collection.json",
+    "description": "Pruebas de TODOS los endpoints de Trendy (user, admin/users, moderation, products, transactions, review, health).\n\nREQUISITOS\n1) API corriendo con prefijo /api. baseUrl por defecto: http://localhost:3000/api. Para Render usa: https://trendy-app-web-un9c.onrender.com/api\n2) Debe existir el admin seed: admin@trendy.local / Admin1234 con rol ADMIN. Si no existe, ejecuta npm run seed o promueve manualmente un admin en la base.\n3) La coleccion registra admin.postman@trendy.test, inicia sesion con el admin seed, obtiene el id del admin postman por login y lo promueve a ADMIN por endpoint. Asi no depende de variables locales de otro computador.\n4) Ejecuta la coleccion COMPLETA y en orden (Collection Runner -> Run). Las carpetas dependen de tokens e ids guardados como variables de coleccion.\n\nPor consola: npx newman run postman/trendy-api.postman_collection.json",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -334,6 +334,161 @@
               }
             }
           ]
+        },
+        {
+          "name": "Login admin seed",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Devuelve id y token JWT del admin seed\", function () { pm.expect(b.token).to.be.a(\"string\").and.not.empty; pm.expect(b.id).to.be.a(\"string\").and.not.empty; });",
+                  "pm.collectionVariables.set(\"tokenSeedAdmin\", b.token);",
+                  "pm.collectionVariables.set(\"seedAdminId\", b.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{seedAdminEmail}}\",\n  \"password\": \"{{seedAdminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login admin postman para obtener id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Devuelve id del admin postman\", function () { pm.expect(b.id).to.be.a(\"string\").and.not.empty; });",
+                  "pm.collectionVariables.set(\"postmanAdmin\", b.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Admin seed actualiza postman-user a admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Rol ADMIN asignado\", function () { pm.expect(pm.response.json().role).to.have.members([\"ADMIN\"]); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenSeedAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roles\": [\n    \"ADMIN\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{postmanAdmin}}/role",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{postmanAdmin}}",
+                "role"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Login admin",
@@ -7861,6 +8016,22 @@
     },
     {
       "key": "transactionId3",
+      "value": ""
+    },
+    {
+      "key": "seedAdminEmail",
+      "value": "admin@trendy.local"
+    },
+    {
+      "key": "seedAdminPassword",
+      "value": "Admin1234"
+    },
+    {
+      "key": "tokenSeedAdmin",
+      "value": ""
+    },
+    {
+      "key": "postmanAdmin",
       "value": ""
     }
   ]

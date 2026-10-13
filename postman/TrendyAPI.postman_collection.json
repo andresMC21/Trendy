@@ -1,11 +1,11 @@
 {
   "info": {
-    "_postman_id": "f6897d81-08c7-40e8-a659-433f0a4c67ea",
+    "_postman_id": "9e932c0d-3d89-491c-a5de-82f896ea2b86",
     "name": "TrendyAPI",
     "description": "Pruebas de TODOS los endpoints de Trendy (user, admin/users, moderation, products, transactions, review, health).\n\nREQUISITOS\n1) API corriendo con prefijo /api. baseUrl por defecto: http://localhost:3000/api. Para Render usa: https://trendy-app-web-un9c.onrender.com/api\n2) Debe existir el admin seed: admin@trendy.local / Admin1234 con rol ADMIN. Si no existe, ejecuta npm run seed o promueve manualmente un admin en la base.\n3) La coleccion registra admin.postman@trendy.test, inicia sesion con el admin seed, obtiene el id del admin postman por login y lo promueve a ADMIN por endpoint. Asi no depende de variables locales de otro computador.\n4) Ejecuta la coleccion COMPLETA y en orden (Collection Runner -> Run). Las carpetas dependen de tokens e ids guardados como variables de coleccion.\n\nPor consola: npx newman run postman/trendy-api.postman_collection.json",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "54443567",
-    "_collection_link": "https://go.postman.co/collection/54443567-f6897d81-08c7-40e8-a659-433f0a4c67ea?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/54443567-9e932c0d-3d89-491c-a5de-82f896ea2b86?source=collection_link"
   },
   "item": [
     {
@@ -8984,41 +8984,9 @@
     },
     {
       "name": "9. Cierre de sesión (/user/logout)",
-      "description": "Pruebas de cierre de sesión (POST /api/user/logout). Cada ejecución crea sus propios usuarios, así que no depende de los demás grupos salvo por tokenAdmin (login del admin) para la verificación y la limpieza final. El cierre es GLOBAL: incrementa la tokenVersion del usuario y todos los JWT emitidos antes dejan de servir.",
       "item": [
         {
           "name": "Preparar: registrar usuario A (nuevo en cada ejecución)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/user/register",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "user",
-                "register"
-              ]
-            },
-            "auth": {
-              "type": "noauth"
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"{{logoutEmailA}}\",\n  \"password\": \"{{password}}\",\n  \"fullName\": \"Usuario Logout A\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
           "event": [
             {
               "listen": "prerequest",
@@ -9046,11 +9014,11 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Preparar: registrar usuario B (para comprobar que no se ve afectado)",
+          ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [
               {
@@ -9058,6 +9026,15 @@
                 "value": "application/json"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{logoutEmailA}}\",\n  \"password\": \"{{password}}\",\n  \"fullName\": \"Usuario Logout A\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{baseUrl}}/user/register",
               "host": [
@@ -9067,20 +9044,12 @@
                 "user",
                 "register"
               ]
-            },
-            "auth": {
-              "type": "noauth"
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"{{logoutEmailB}}\",\n  \"password\": \"{{password}}\",\n  \"fullName\": \"Usuario Logout B\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
             }
           },
+          "response": []
+        },
+        {
+          "name": "Preparar: registrar usuario B (para comprobar que no se ve afectado)",
           "event": [
             {
               "listen": "test",
@@ -9092,11 +9061,11 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Preparar: login de A – sesión 1 (navegador)",
+          ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [
               {
@@ -9104,29 +9073,30 @@
                 "value": "application/json"
               }
             ],
-            "url": {
-              "raw": "{{baseUrl}}/user/login",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "user",
-                "login"
-              ]
-            },
-            "auth": {
-              "type": "noauth"
-            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"{{logoutEmailA}}\",\n  \"password\": \"{{password}}\"\n}",
+              "raw": "{\n  \"email\": \"{{logoutEmailB}}\",\n  \"password\": \"{{password}}\",\n  \"fullName\": \"Usuario Logout B\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "register"
+              ]
             }
           },
+          "response": []
+        },
+        {
+          "name": "Preparar: login de A – sesión 1 (navegador)",
           "event": [
             {
               "listen": "test",
@@ -9145,11 +9115,11 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Preparar: login de A – sesión 2 (otro dispositivo)",
+          ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [
               {
@@ -9157,6 +9127,15 @@
                 "value": "application/json"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{logoutEmailA}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{baseUrl}}/user/login",
               "host": [
@@ -9166,20 +9145,12 @@
                 "user",
                 "login"
               ]
-            },
-            "auth": {
-              "type": "noauth"
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"{{logoutEmailA}}\",\n  \"password\": \"{{password}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
             }
           },
+          "response": []
+        },
+        {
+          "name": "Preparar: login de A – sesión 2 (otro dispositivo)",
           "event": [
             {
               "listen": "test",
@@ -9197,11 +9168,11 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Preparar: login de B",
+          ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [
               {
@@ -9209,6 +9180,15 @@
                 "value": "application/json"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{logoutEmailA}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{baseUrl}}/user/login",
               "host": [
@@ -9218,20 +9198,12 @@
                 "user",
                 "login"
               ]
-            },
-            "auth": {
-              "type": "noauth"
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"{{logoutEmailB}}\",\n  \"password\": \"{{password}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
             }
           },
+          "response": []
+        },
+        {
+          "name": "Preparar: login de B",
           "event": [
             {
               "listen": "test",
@@ -9243,34 +9215,42 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Antes del logout: GET /user/me con la sesión 1 → 200",
+          ],
           "request": {
-            "method": "GET",
-            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{logoutEmailB}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
-              "raw": "{{baseUrl}}/user/me",
+              "raw": "{{baseUrl}}/user/login",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "user",
-                "me"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{logoutToken1}}",
-                  "type": "string"
-                }
+                "login"
               ]
             }
           },
+          "response": []
+        },
+        {
+          "name": "Antes del logout: GET /user/me con la sesión 1 → 200",
           "event": [
             {
               "listen": "test",
@@ -9283,11 +9263,18 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Antes del logout: GET /user/me con la sesión 2 → 200",
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{logoutToken1}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -9299,7 +9286,24 @@
                 "user",
                 "me"
               ]
-            },
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Antes del logout: GET /user/me con la sesión 2 → 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -9309,23 +9313,7 @@
                   "type": "string"
                 }
               ]
-            }
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Antes del logout: GET /user/me con el token del registro → 200",
-          "request": {
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -9337,18 +9325,12 @@
                 "user",
                 "me"
               ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{logoutTokenReg}}",
-                  "type": "string"
-                }
-              ]
             }
           },
+          "response": []
+        },
+        {
+          "name": "Antes del logout: GET /user/me con el token del registro → 200",
           "event": [
             {
               "listen": "test",
@@ -9359,11 +9341,50 @@
                 ]
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{logoutTokenReg}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "me"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "POST /user/logout sin token → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ],
           "request": {
+            "auth": {
+              "type": "noauth"
+            },
             "method": "POST",
             "header": [],
             "url": {
@@ -9375,49 +9396,12 @@
                 "user",
                 "logout"
               ]
-            },
-            "auth": {
-              "type": "noauth"
             }
           },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
-                ]
-              }
-            }
-          ]
+          "response": []
         },
         {
           "name": "POST /user/logout con un token inválido → 401",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/user/logout",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "user",
-                "logout"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "esto.no.es.un.jwt",
-                  "type": "string"
-                }
-              ]
-            }
-          },
           "event": [
             {
               "listen": "test",
@@ -9428,11 +9412,18 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "POST /user/logout con un token manipulado (tokenVersion alterada, firma inválida) → 401",
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{auth_secret_0wst}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "url": {
@@ -9444,18 +9435,12 @@
                 "user",
                 "logout"
               ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{logoutTokenTampered}}",
-                  "type": "string"
-                }
-              ]
             }
           },
+          "response": []
+        },
+        {
+          "name": "POST /user/logout con un token manipulado (tokenVersion alterada, firma inválida) → 401",
           "event": [
             {
               "listen": "prerequest",
@@ -9479,34 +9464,35 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Tras el intento manipulado la sesión 1 sigue viva → 200",
+          ],
           "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/user/me",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "user",
-                "me"
-              ]
-            },
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{logoutToken1}}",
+                  "value": "{{logoutTokenTampered}}",
                   "type": "string"
                 }
               ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "logout"
+              ]
             }
           },
+          "response": []
+        },
+        {
+          "name": "Tras el intento manipulado la sesión 1 sigue viva → 200",
           "event": [
             {
               "listen": "test",
@@ -9517,11 +9503,57 @@
                 ]
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{logoutToken1}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "me"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "POST /user/logout (sesión 1) → 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });\nconst b = pm.response.json();\npm.test(\"Confirma el cierre y no entrega un token nuevo\", function () { pm.expect(b.message).to.eql(\"Session successfuly closed\"); pm.expect(b).to.not.have.property(\"token\"); });"
+                ]
+              }
+            }
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{logoutToken1}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "url": {
@@ -9533,47 +9565,24 @@
                 "user",
                 "logout"
               ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{logoutToken1}}",
-                  "type": "string"
-                }
-              ]
             }
           },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
-                  "const b = pm.response.json();",
-                  "pm.test(\"Confirma el cierre y no entrega un token nuevo\", function () { pm.expect(b.message).to.eql(\"Session successfully closed\"); pm.expect(b).to.not.have.property(\"token\"); });"
-                ]
-              }
-            }
-          ]
+          "response": []
         },
         {
           "name": "Tras el logout: GET /user/me con la sesión 1 → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });\npm.test(\"Mensaje de sesión cerrada\", function () { pm.expect(pm.response.json().message).to.eql(\"Invalid token\"); });"
+                ]
+              }
+            }
+          ],
           "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/user/me",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "user",
-                "me"
-              ]
-            },
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -9583,24 +9592,7 @@
                   "type": "string"
                 }
               ]
-            }
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });",
-                  "pm.test(\"Mensaje de sesión cerrada\", function () { pm.expect(pm.response.json().message).to.eql(\"Invalid token or session closed\"); });"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Tras el logout: la sesión 2 (otro dispositivo) también queda inválida → 401",
-          "request": {
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -9612,7 +9604,24 @@
                 "user",
                 "me"
               ]
-            },
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Tras el logout: la sesión 2 (otro dispositivo) también queda inválida → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });\npm.test(\"El cierre es global: invalida TODAS las sesiones del usuario\", function () { pm.expect(pm.response.json().message).to.eql(\"Invalid token\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -9622,24 +9631,7 @@
                   "type": "string"
                 }
               ]
-            }
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });",
-                  "pm.test(\"El cierre es global: invalida TODAS las sesiones del usuario\", function () { pm.expect(pm.response.json().message).to.eql(\"Invalid token or session closed\"); });"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Tras el logout: el token del registro también queda inválido → 401",
-          "request": {
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -9651,18 +9643,12 @@
                 "user",
                 "me"
               ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{logoutTokenReg}}",
-                  "type": "string"
-                }
-              ]
             }
           },
+          "response": []
+        },
+        {
+          "name": "Tras el logout: el token del registro también queda inválido → 401",
           "event": [
             {
               "listen": "test",
@@ -9673,11 +9659,57 @@
                 ]
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{logoutTokenReg}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "me"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "POST /user/logout repetido con el token ya cerrado → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{logoutToken1}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "url": {
@@ -9689,18 +9721,12 @@
                 "user",
                 "logout"
               ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{logoutToken1}}",
-                  "type": "string"
-                }
-              ]
             }
           },
+          "response": []
+        },
+        {
+          "name": "Tras el logout: PATCH /user/me con el token cerrado → 401",
           "event": [
             {
               "listen": "test",
@@ -9711,11 +9737,18 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Tras el logout: PATCH /user/me con el token cerrado → 401",
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{logoutToken1}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "PATCH",
             "header": [
               {
@@ -9723,6 +9756,15 @@
                 "value": "application/json"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"info\": \"no debería guardarse\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{baseUrl}}/user/me",
               "host": [
@@ -9732,27 +9774,12 @@
                 "user",
                 "me"
               ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{logoutToken1}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"info\": \"no debería guardarse\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
             }
           },
+          "response": []
+        },
+        {
+          "name": "Tras el logout: GET /transactions con el token cerrado → 401 (otro módulo)",
           "event": [
             {
               "listen": "test",
@@ -9763,11 +9790,18 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Tras el logout: GET /transactions con el token cerrado → 401 (otro módulo)",
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{logoutToken1}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -9778,18 +9812,12 @@
               "path": [
                 "transactions"
               ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{logoutToken1}}",
-                  "type": "string"
-                }
-              ]
             }
           },
+          "response": []
+        },
+        {
+          "name": "Tras el logout: GET /review con el token cerrado → 401 (otro módulo)",
           "event": [
             {
               "listen": "test",
@@ -9800,11 +9828,18 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Tras el logout: GET /review con el token cerrado → 401 (otro módulo)",
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{logoutToken1}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -9815,18 +9850,12 @@
               "path": [
                 "review"
               ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{logoutToken1}}",
-                  "type": "string"
-                }
-              ]
             }
           },
+          "response": []
+        },
+        {
+          "name": "Tras el logout: POST /products con el token cerrado → 401 (otro módulo)",
           "event": [
             {
               "listen": "test",
@@ -9837,27 +9866,8 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Tras el logout: POST /products con el token cerrado → 401 (otro módulo)",
+          ],
           "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/products",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "products"
-              ]
-            },
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -9868,6 +9878,13 @@
                 }
               ]
             },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "body": {
               "mode": "raw",
               "raw": "{\n  \"title\": \"No debería crearse\",\n  \"description\": \"x\",\n  \"category\": \"otros\",\n  \"condition\": \"USADO\",\n  \"location\": {\n    \"lat\": 3.45,\n    \"lng\": -76.53\n  },\n  \"neighborhoodId\": \"granada\"\n}",
@@ -9876,46 +9893,21 @@
                   "language": "json"
                 }
               }
-            }
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "El logout de A no afecta a B: GET /user/me de B → 200",
-          "request": {
-            "method": "GET",
-            "header": [],
+            },
             "url": {
-              "raw": "{{baseUrl}}/user/me",
+              "raw": "{{baseUrl}}/products",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "user",
-                "me"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{logoutTokenB}}",
-                  "type": "string"
-                }
+                "products"
               ]
             }
           },
+          "response": []
+        },
+        {
+          "name": "El logout de A no afecta a B: GET /user/me de B → 200",
           "event": [
             {
               "listen": "test",
@@ -9927,35 +9919,35 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "El logout no desactiva la cuenta: el admin ve a A activo",
+          ],
           "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/admin/users/{{logoutIdA}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "users",
-                "{{logoutIdA}}"
-              ]
-            },
             "auth": {
               "type": "bearer",
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{tokenAdmin}}",
+                  "value": "{{logoutTokenB}}",
                   "type": "string"
                 }
               ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "me"
+              ]
             }
           },
+          "response": []
+        },
+        {
+          "name": "El logout no desactiva la cuenta: el admin ve a A activo",
           "event": [
             {
               "listen": "test",
@@ -9968,41 +9960,36 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Volver a entrar: login de A después del logout → 200",
+          ],
           "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/user/login",
+              "raw": "{{baseUrl}}/admin/users/{{logoutIdA}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "user",
-                "login"
+                "admin",
+                "users",
+                "{{logoutIdA}}"
               ]
-            },
-            "auth": {
-              "type": "noauth"
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"{{logoutEmailA}}\",\n  \"password\": \"{{password}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
             }
           },
+          "response": []
+        },
+        {
+          "name": "Volver a entrar: login de A después del logout → 200",
           "event": [
             {
               "listen": "test",
@@ -10020,34 +10007,42 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Volver a entrar: el token nuevo sí funciona → 200",
+          ],
           "request": {
-            "method": "GET",
-            "header": [],
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{logoutEmailA}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
-              "raw": "{{baseUrl}}/user/me",
+              "raw": "{{baseUrl}}/user/login",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "user",
-                "me"
-              ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{logoutToken3}}",
-                  "type": "string"
-                }
+                "login"
               ]
             }
           },
+          "response": []
+        },
+        {
+          "name": "Volver a entrar: el token nuevo sí funciona → 200",
           "event": [
             {
               "listen": "test",
@@ -10058,11 +10053,18 @@
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Volver a entrar: el token viejo sigue muerto → 401",
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{logoutToken3}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -10074,18 +10076,12 @@
                 "user",
                 "me"
               ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{logoutToken1}}",
-                  "type": "string"
-                }
-              ]
             }
           },
+          "response": []
+        },
+        {
+          "name": "Volver a entrar: el token viejo sigue muerto → 401",
           "event": [
             {
               "listen": "test",
@@ -10096,11 +10092,57 @@
                 ]
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{logoutToken1}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "me"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Segundo ciclo: POST /user/logout con el token nuevo → 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{logoutToken3}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "POST",
             "header": [],
             "url": {
@@ -10112,7 +10154,24 @@
                 "user",
                 "logout"
               ]
-            },
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Segundo ciclo: el token ya cerrado → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ],
+          "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -10122,23 +10181,7 @@
                   "type": "string"
                 }
               ]
-            }
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Segundo ciclo: el token ya cerrado → 401",
-          "request": {
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -10150,63 +10193,12 @@
                 "user",
                 "me"
               ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{logoutToken3}}",
-                  "type": "string"
-                }
-              ]
             }
           },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
-                ]
-              }
-            }
-          ]
+          "response": []
         },
         {
           "name": "Segundo ciclo: login de A → 200",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/user/login",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "user",
-                "login"
-              ]
-            },
-            "auth": {
-              "type": "noauth"
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"{{logoutEmailA}}\",\n  \"password\": \"{{password}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          },
           "event": [
             {
               "listen": "test",
@@ -10224,11 +10216,64 @@
                 ]
               }
             }
-          ]
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{logoutEmailA}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "login"
+              ]
+            }
+          },
+          "response": []
         },
         {
           "name": "Segundo ciclo: el token nuevo funciona → 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{logoutToken4}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "GET",
             "header": [],
             "url": {
@@ -10240,33 +10285,35 @@
                 "user",
                 "me"
               ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{logoutToken4}}",
-                  "type": "string"
-                }
-              ]
             }
           },
+          "response": []
+        },
+        {
+          "name": "Limpieza: el admin desactiva a A (soft delete)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"A queda inactivo\", function () { pm.expect(pm.response.json().isActive).to.eql(false); });"
                 ]
               }
             }
-          ]
-        },
-        {
-          "name": "Limpieza: el admin desactiva a A (soft delete)",
+          ],
           "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAdmin}}",
+                  "type": "string"
+                }
+              ]
+            },
             "method": "DELETE",
             "header": [],
             "url": {
@@ -10279,7 +10326,24 @@
                 "users",
                 "{{logoutIdA}}"
               ]
-            },
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Limpieza: el admin desactiva a B (soft delete)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
             "auth": {
               "type": "bearer",
               "bearer": [
@@ -10289,24 +10353,7 @@
                   "type": "string"
                 }
               ]
-            }
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
-                  "pm.test(\"A queda inactivo\", function () { pm.expect(pm.response.json().isActive).to.eql(false); });"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Limpieza: el admin desactiva a B (soft delete)",
-          "request": {
+            },
             "method": "DELETE",
             "header": [],
             "url": {
@@ -10319,31 +10366,12 @@
                 "users",
                 "{{logoutIdB}}"
               ]
-            },
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{tokenAdmin}}",
-                  "type": "string"
-                }
-              ]
             }
           },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
-                ]
-              }
-            }
-          ]
+          "response": []
         }
-      ]
+      ],
+      "description": "Pruebas de cierre de sesión (POST /api/user/logout). Cada ejecución crea sus propios usuarios, así que no depende de los demás grupos salvo por tokenAdmin (login del admin) para la verificación y la limpieza final. El cierre es GLOBAL: incrementa la tokenVersion del usuario y todos los JWT emitidos antes dejan de servir."
     }
   ],
   "event": [
@@ -10523,8 +10551,7 @@
       "value": ""
     },
     {
-      "key": "auth_secret_10fh",
-      "secret": true
+      "key": "auth_secret_10fh"
     },
     {
       "key": "seedAdminId",
@@ -10581,6 +10608,10 @@
     {
       "key": "logoutVersion0",
       "value": ""
+    },
+    {
+      "key": "auth_secret_0wst",
+      "secret": true
     }
   ]
 }

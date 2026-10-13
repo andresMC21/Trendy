@@ -305,7 +305,7 @@ describe('Users (e2e)', () => {
         .set(auth(oldToken))
         .expect(200);
 
-      expect(logoutRes.body.message).toBe('Sesión cerrada correctamente');
+      expect(logoutRes.body.message).toBe('Session successfuly closed');
 
       await http.get('/api/user/me').set(auth(oldToken)).expect(401);
       await http.post('/api/user/logout').set(auth(oldToken)).expect(401);

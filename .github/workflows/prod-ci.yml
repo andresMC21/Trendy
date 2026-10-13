@@ -38,3 +38,4 @@ jobs:
       - name: Desplegar en Render
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && env.RENDER_DEPLOY_HOOK_URL != ''
         run: curl -fsS -X POST "$RENDER_DEPLOY_HOOK_URL"
+        run: npm run seed

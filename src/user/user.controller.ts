@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -41,7 +42,7 @@ import { UserService } from './user.service';
 @ApiTags('Users')
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   // TODO(Camilo): endpoints temporales de register/login para poder probar
   // los demas modulos. Reemplazar por los definitivos del modulo 1.
@@ -98,6 +99,26 @@ export class UserController {
     return this.userService.login(dto);
   }
 
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  @Auth()
+  @ApiOperation({
+    summary: 'Cerrar sesión',
+    description:
+      'Invalida los tokens JWT previamente emitidos para el usuario autenticado. Requiere enviar un JWT válido.',
+  })
+  @ApiOkResponse({
+    type: MessageResponseDto,
+    description: 'La sesión se cerró correctamente.',
+    example: { message: 'Session successfuly closed' },
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Error inesperado al cerrar la sesión.',
+  })
+  logout(@GetUser() user: User): Promise<MessageResponseDto> {
+    return this.userService.logout(user);
+  }
+
   // Las rutas /me van antes de /:id para que ':id' no las capture.
 
   @Get('me')
@@ -123,7 +144,7 @@ export class UserController {
   @ApiOperation({
     summary: 'Actualizar el perfil propio',
     description:
-      'Permite cambiar fullName, photoUrl e info. fullName no se puede cambiar mientras la verificación esté PENDING o VERIFIED.',
+      'Permite cambiar fullName e info. fullName no se puede cambiar mientras la verificación esté PENDING o VERIFIED.',
   })
   @ApiBody({
     type: UpdateUserDto,

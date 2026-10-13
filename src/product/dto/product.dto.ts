@@ -168,13 +168,6 @@ export class ProductSellerDto {
   fullName: string;
 
   @ApiProperty({
-    type: String,
-    nullable: true,
-    description: 'URL de la foto del vendedor o null si no está definida.',
-  })
-  photoUrl: string | null;
-
-  @ApiProperty({
     type: Number,
     description: 'Promedio de calificaciones recibidas por el vendedor.',
   })

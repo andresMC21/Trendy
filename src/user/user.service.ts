@@ -95,7 +95,7 @@ export class UserService {
 
     const user = await this.userRepository.findOne({
       where: { email },
-      select: { id: true, email: true, password: true, isActive: true },
+      select: { id: true, email: true, password: true, isActive: true, tokenVersion: true },
     });
 
     const passwordMatches = user?.password

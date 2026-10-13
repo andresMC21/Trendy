@@ -1,4 +1,4 @@
-import { HTTP_CODE_METADATA } from '@nestjs/common/constants';
+import { GUARDS_METADATA, HTTP_CODE_METADATA } from '@nestjs/common/constants';
 import { PassportModule } from '@nestjs/passport';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
@@ -9,6 +9,7 @@ describe('UserController', () => {
   const userService = {
     create: jest.fn(),
     login: jest.fn(),
+    logout: jest.fn(),
     findMe: jest.fn(),
     updateMe: jest.fn(),
     changePassword: jest.fn(),
@@ -43,6 +44,33 @@ describe('UserController', () => {
         UserController.prototype.requestVerification,
       ),
     ).toBe(200);
+  });
+
+  it('logout responde 200 y exige autenticación, mientras que login es público', () => {
+    // Assert
+    expect(
+      Reflect.getMetadata(HTTP_CODE_METADATA, UserController.prototype.logout),
+    ).toBe(200);
+    expect(
+      Reflect.getMetadata(GUARDS_METADATA, UserController.prototype.logout),
+    ).toHaveLength(2); // AuthGuard (JWT) + UserRoleGuard
+    expect(
+      Reflect.getMetadata(GUARDS_METADATA, UserController.prototype.login),
+    ).toBeUndefined();
+  });
+
+  it('logout delega al servicio con el usuario autenticado', async () => {
+    // Arrange
+    const user = { id: 'u1' } as never;
+    userService.logout.mockResolvedValue({ message: 'Session successfully closed' });
+
+    // Act
+    const result = await controller.logout(user);
+
+    // Assert
+    expect(result).toEqual({ message: 'Session successfully closed' });
+    expect(userService.logout).toHaveBeenCalledTimes(1);
+    expect(userService.logout).toHaveBeenCalledWith(user);
   });
 
   it('register delega al servicio', async () => {

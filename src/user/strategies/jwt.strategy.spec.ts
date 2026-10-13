@@ -75,7 +75,7 @@ describe('JwtStrategy', () => {
       // Act / Assert
       await expect(
         build().validate(payload({ tokenVersion: 0 })),
-      ).rejects.toThrow('Invalid token or session closed');
+      ).rejects.toThrow('Invalid token');
     });
 
     it('rechaza tokens de varias sesiones anteriores tras cerrar sesión varias veces', async () => {
@@ -130,7 +130,7 @@ describe('JwtStrategy', () => {
 
       // Act / Assert
       await expect(build().validate(legacy)).rejects.toThrow(
-        'Invalid token or session closed',
+        'Invalid token',
       );
     });
 

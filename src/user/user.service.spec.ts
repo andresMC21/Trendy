@@ -152,7 +152,7 @@ describe('UserService', () => {
       // Assert
       expect(userRepository.findOne).toHaveBeenCalledWith({
         where: { email: 'ana@example.com' },
-        select: { id: true, email: true, password: true, isActive: true },
+        select: { id: true, email: true, password: true, isActive: true, tokenVersion: true },
       });
       expect(result).toEqual({
         id: 'user-1',

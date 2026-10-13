@@ -33,15 +33,6 @@ export class UserProfileDto {
   @ApiProperty({
     type: String,
     nullable: true,
-    example: 'https://example.com/vendedor.png',
-    description: 'URL de la foto de perfil o null si no está definida.',
-  })
-  @Expose()
-  photoUrl: string | null;
-
-  @ApiProperty({
-    type: String,
-    nullable: true,
     description: 'Información adicional del perfil o null si no está definida.',
   })
   @Expose()

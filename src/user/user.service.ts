@@ -82,6 +82,7 @@ export class UserService {
         token: this.getJwtToken({
           id: user.id,
           email: user.email,
+          tokenVersion: user.tokenVersion,
         }),
       };
     } catch (error) {
@@ -94,7 +95,7 @@ export class UserService {
 
     const user = await this.userRepository.findOne({
       where: { email },
-      select: { id: true, email: true, password: true, isActive: true },
+      select: { id: true, email: true, password: true, isActive: true, tokenVersion: true },
     });
 
     const passwordMatches = user?.password
@@ -113,8 +114,16 @@ export class UserService {
       token: this.getJwtToken({
         id: user.id,
         email: user.email,
+        tokenVersion: user.tokenVersion
       }),
     };
+  }
+
+  async logout(user: User): Promise<{ message: string }> {
+
+    await this.userRepository.increment({ id: user.id }, 'tokenVersion', 1);
+    return { message: 'Session successfuly closed' };
+
   }
 
   // ---------------------------------------------------------------------------
@@ -290,7 +299,6 @@ export class UserService {
         'user.id',
         'user.email',
         'user.fullName',
-        'user.photoUrl',
         'user.info',
         'user.role',
         'user.verificationStatus',

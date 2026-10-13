@@ -61,7 +61,6 @@ describe('Transaction entity', () => {
       email: 'user@example.com',
       password: 'hash',
       fullName: 'Usuario',
-      photoUrl: undefined,
       info: 'bio',
       verificationStatus: VerificationStatus.UNVERIFIED,
       ratingAverage: 0,
@@ -79,7 +78,6 @@ describe('Transaction entity', () => {
     expect(result).toEqual({
       id: 'user-1',
       fullName: 'Usuario',
-      photoUrl: null,
     });
     expect(TransactionUserDto.fromEntity(undefined)).toBeUndefined();
   });

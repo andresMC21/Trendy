@@ -152,7 +152,6 @@ export class ProductService {
       .addSelect([
         'seller.id',
         'seller.fullName',
-        'seller.photoUrl',
         'seller.ratingAverage',
         'seller.reviewsCount',
       ])
@@ -173,7 +172,6 @@ export class ProductService {
     dto.seller = {
       id: product.seller.id,
       fullName: product.seller.fullName,
-      photoUrl: product.seller.photoUrl ?? null,
       ratingAverage: product.seller.ratingAverage ?? 0,
       reviewsCount: product.seller.reviewsCount ?? 0,
     };

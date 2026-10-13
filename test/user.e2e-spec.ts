@@ -282,4 +282,45 @@ describe('Users (e2e)', () => {
       .set(auth(token))
       .expect(404);
   });
+
+  describe('POST /user/logout', () => {
+    it('requiere autenticación', async () => {
+      await http.post('/api/user/logout').expect(401);
+    });
+
+    it('invalida el token y exige un nuevo inicio de sesión', async () => {
+      const user = newUser('logout');
+
+      const registerRes = await http
+        .post('/api/user/register')
+        .send(user)
+        .expect(201);
+
+      const oldToken: string = registerRes.body.token;
+
+      await http.get('/api/user/me').set(auth(oldToken)).expect(200);
+
+      const logoutRes = await http
+        .post('/api/user/logout')
+        .set(auth(oldToken))
+        .expect(200);
+
+      expect(logoutRes.body.message).toBe('Session successfuly closed');
+
+      await http.get('/api/user/me').set(auth(oldToken)).expect(401);
+      await http.post('/api/user/logout').set(auth(oldToken)).expect(401);
+
+      const loginRes = await http
+        .post('/api/user/login')
+        .send({ email: user.email, password })
+        .expect(200);
+
+      const newToken: string = loginRes.body.token;
+
+      await http.get('/api/user/me').set(auth(newToken)).expect(200);
+
+      await http.get('/api/user/me').set(auth(oldToken)).expect(401);
+    });
+  });
+
 });

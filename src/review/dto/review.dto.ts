@@ -15,13 +15,6 @@ export class ReviewUserDto {
     description: 'Nombre completo del usuario.',
   })
   fullName: string;
-
-  @ApiProperty({
-    type: String,
-    nullable: true,
-    description: 'URL de la foto del usuario o null si no está definida.',
-  })
-  photoUrl: string | null;
 }
 
 export class ReviewDto {
@@ -83,12 +76,10 @@ export class ReviewDto {
     dto.reviewer = {
       id: review.reviewer.id,
       fullName: review.reviewer.fullName,
-      photoUrl: review.reviewer.photoUrl,
     };
     dto.targetUser = {
       id: review.targetUser.id,
       fullName: review.targetUser.fullName,
-      photoUrl: review.targetUser.photoUrl,
     };
     dto.rating = review.rating;
     dto.comment = review.comment;

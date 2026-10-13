@@ -21,7 +21,7 @@ const makeUser = (overrides: Partial<User> = {}): User =>
     email: 'ana@example.com',
     password: 'hash',
     fullName: 'Ana Gomez',
-    photoUrl: null,
+    tokenVersion: 0,
     info: 'Vendedora local',
     verificationStatus: VerificationStatus.UNVERIFIED,
     ratingAverage: 4.5,
@@ -152,7 +152,7 @@ describe('UserService', () => {
       // Assert
       expect(userRepository.findOne).toHaveBeenCalledWith({
         where: { email: 'ana@example.com' },
-        select: { id: true, email: true, password: true, isActive: true },
+        select: { id: true, email: true, password: true, isActive: true, tokenVersion: true },
       });
       expect(result).toEqual({
         id: 'user-1',

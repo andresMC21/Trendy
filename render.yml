@@ -13,7 +13,7 @@ services:
     region: oregon
     branch: main
     buildCommand: npm install --include=dev && npm run build
-    startCommand: npm run migration:run:prod && npm run start:prod
+    startCommand: npm run migration:run:prod && npm run start:prod && npm run seed
     healthCheckPath: /api/health
     envVars:
       - key: NODE_VERSION

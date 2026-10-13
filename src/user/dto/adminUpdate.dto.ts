@@ -4,8 +4,8 @@ import { IsEmail, IsOptional } from 'class-validator';
 import { UpdateUserDto } from './update.dto';
 
 /**
- * Edición de un usuario por un admin: los campos de perfil (fullName,
- * photoUrl, info) más el email. Rol, estado activo y verificación tienen
+ * Edición de un usuario por un admin: los campos de perfil (fullName, info)
+ * más el email. Rol, estado activo y verificación tienen
  * endpoints propios; password, ratingAverage y reviewsCount nunca se editan.
  */
 export class AdminUpdateUserDto extends UpdateUserDto {

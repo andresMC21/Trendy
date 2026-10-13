@@ -140,7 +140,7 @@ export class AdminUserController {
   @ApiOperation({
     summary: 'Editar los datos de perfil de un usuario',
     description:
-      'Solo ADMIN. Permite modificar fullName, email, photoUrl e info; roles, estado activo y verificación tienen operaciones independientes.',
+      'Solo ADMIN. Permite modificar fullName, email e info; roles, estado activo y verificación tienen operaciones independientes.',
   })
   @ApiParam({
     name: 'id',

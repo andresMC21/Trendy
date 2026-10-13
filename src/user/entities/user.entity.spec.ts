@@ -27,7 +27,7 @@ describe('User entity', () => {
         'email',
         'password',
         'fullName',
-        'photoUrl',
+        'tokenVersion',
         'info',
         'verificationStatus',
         'ratingAverage',
@@ -65,11 +65,15 @@ describe('User entity', () => {
     );
     const active = columns.find((column) => column.propertyName === 'isActive');
     const role = columns.find((column) => column.propertyName === 'role');
+    const tokenVersion = columns.find(
+      (column) => column.propertyName === 'tokenVersion',
+    );
 
     // Act / Assert
     expect(status?.options.default).toBe(VerificationStatus.UNVERIFIED);
     expect(active?.options.default).toBe(true);
     expect(role?.options.default).toEqual([ValidRoles.USER]);
+    expect(tokenVersion?.options.default).toBe(0);
   });
 
   it('normaliza email antes de insertar o actualizar', () => {

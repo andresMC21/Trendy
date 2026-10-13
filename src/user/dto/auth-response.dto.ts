@@ -35,7 +35,7 @@ export class RegisterResponseDto extends UserProfileDto {
 export class MessageResponseDto {
   @ApiProperty({
     type: String,
-    description: 'Mensaje que confirma el cambio de contraseña.',
+    description: 'Mensaje que confirma la operación realizada.',
   })
   message: string;
 }

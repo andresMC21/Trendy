@@ -33,10 +33,10 @@ export class User {
   fullName: string;
 
   @Column({
-    type: 'text',
-    nullable: true,
+    type: 'int',
+    default: 0
   })
-  photoUrl: string | null;
+  tokenVersion: number;
 
   @Column({
     type: 'text',

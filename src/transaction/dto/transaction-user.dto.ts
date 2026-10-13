@@ -15,19 +15,11 @@ export class TransactionUserDto {
   })
   fullName: string;
 
-  @ApiProperty({
-    type: String,
-    nullable: true,
-    description: 'URL de la foto del participante o null si no está definida.',
-  })
-  photoUrl: string | null;
-
   static fromEntity(user?: User): TransactionUserDto | undefined {
     if (!user) return undefined;
     return {
       id: user.id,
       fullName: user.fullName,
-      photoUrl: user.photoUrl ?? null,
     };
   }
 }

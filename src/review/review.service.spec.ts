@@ -16,7 +16,6 @@ const makeUser = (over: Partial<User> = {}) =>
   ({
     id: 'buyer-1',
     fullName: 'Buyer',
-    photoUrl: null,
     ...over,
   }) as User;
 

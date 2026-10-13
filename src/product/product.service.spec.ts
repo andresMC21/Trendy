@@ -301,7 +301,7 @@ describe('ProductService', () => {
     it('suma una visita y devuelve el vendedor sin datos sensibles', async () => {
       // Arrange
       qb.getOne.mockResolvedValue(
-        makeProduct({ seller: { id: 'seller-1', fullName: 'Ana', photoUrl: undefined, ratingAverage: 4.5, reviewsCount: 2, password: 'hash', email: 'a@a.com' } as any }),
+        makeProduct({ seller: { id: 'seller-1', fullName: 'Ana', ratingAverage: 4.5, reviewsCount: 2, password: 'hash', email: 'a@a.com' } as any }),
       );
 
       // Act
@@ -310,7 +310,7 @@ describe('ProductService', () => {
       // Assert
       expect(productRepo.increment).toHaveBeenCalledWith({ id: 'p1' }, 'viewsCount', 1);
       expect(res.viewsCount).toBe(1);
-      expect(res.seller).toEqual({ id: 'seller-1', fullName: 'Ana', photoUrl: null, ratingAverage: 4.5, reviewsCount: 2 });
+      expect(res.seller).toEqual({ id: 'seller-1', fullName: 'Ana', ratingAverage: 4.5, reviewsCount: 2 });
     });
 
     it('usa 0 por defecto si el vendedor no tiene rating', async () => {

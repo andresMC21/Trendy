@@ -1060,7 +1060,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
-                  "pm.test(\"photoUrl actualizada\", function () { pm.expect(pm.response.json().photoUrl).to.eql(\"https://example.com/vendedor.png\"); });"
+                  "pm.test(\"Información actualizada\", function () { pm.expect(pm.response.json().info).to.eql(\"Perfil actualizado desde Postman\"); });"
                 ]
               }
             }
@@ -1085,7 +1085,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fullName\": \"Vendedor Postman\",\n  \"photoUrl\": \"https://example.com/vendedor.png\"\n}",
+              "raw": "{\n  \"fullName\": \"Vendedor Postman\",\n  \"info\": \"Perfil actualizado desde Postman\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1106,7 +1106,7 @@
           "response": []
         },
         {
-          "name": "PATCH /user/me: photoUrl inválida → 400",
+          "name": "PATCH /user/me: campo eliminado → 400",
           "event": [
             {
               "listen": "test",
@@ -1139,7 +1139,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"photoUrl\": \"no-es-url\"\n}",
+              "raw": "{\n  \"removedProfileField\": \"no-permitido\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -2636,7 +2636,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
-                  "pm.test(\"Cambios aplicados\", function () { const u = pm.response.json(); pm.expect(u.fullName).to.eql(\"Temporal Editado Por Admin\"); pm.expect(u.photoUrl).to.eql(\"https://example.com/temp.png\"); });"
+                  "pm.test(\"Cambios aplicados\", function () { const u = pm.response.json(); pm.expect(u.fullName).to.eql(\"Temporal Editado Por Admin\"); pm.expect(u.info).to.eql(\"Perfil actualizado por admin\"); });"
                 ]
               }
             }
@@ -2661,7 +2661,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fullName\": \"Temporal Editado Por Admin\",\n  \"photoUrl\": \"https://example.com/temp.png\"\n}",
+              "raw": "{\n  \"fullName\": \"Temporal Editado Por Admin\",\n  \"info\": \"Perfil actualizado por admin\"\n}",
               "options": {
                 "raw": {
                   "language": "json"

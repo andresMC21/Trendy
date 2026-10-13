@@ -75,7 +75,7 @@ export class UserService {
       });
 
       await this.userRepository.save(user);
-      const { password: _, ...safeUser } = user;
+      const { password: _password, tokenVersion: _tokenVersion, ...safeUser } = user;
 
       return {
         ...safeUser,
